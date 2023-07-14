@@ -1,0 +1,29 @@
+{
+	"@metadata": {
+		"authors": [
+			"Jayden Bailey"
+		]
+	},
+	"migrateuseraccount": "The title used on Special:MigrateUserAccount.",
+	"migrateuseraccount-desc": "The description for the extension displayed on Special:Version.",
+	"migrateuseraccount-loginprompt": "The prompt displayed to users when visiting the login or create account pages.",
+	"migrateuseraccount-error-loggedin": "The error displayed to users who are already logged in.",
+	"migrateuseraccount-error-invalid-user": "The error displayed to users who try to migrate an invalid user.",
+	"migrateuseraccount-help": "The help text displayed on Special:MigrateUserAccount, providing guidance on how to use the page.",
+	"migrateuseraccount-form-password-help": "The help text displayed on the password field.",
+	"migrateuseraccount-token-title": "The text which provides the user with a unique token.\nParameters:\n* $1 - Username\n* $2 - Token",
+	"migrateuseraccount-token-help": "The text displayed to users to guide them on how to verify their account on the external wiki.\nParameters:\n* $1 - URL for the external wiki",
+	"migrateuseraccount-token-button": "The text displayed on the button users click to confirm they have completed the verification steps",
+	"migrateuseraccount-token-no-token": "The error displayed to users if no token was found on the external wiki's page.",
+	"migrateuseraccount-token-no-recent-edit": "The error displayed to users if the external wiki page has not been edited in over 10 minutes.",
+	"migrateuseraccount-token-username-no-match": "The error displayed to users if the last edit to the external wiki page was made by a different user.",
+	"migrateuseraccount-form-password": "The text used on the form label for the password field.",
+	"migrateuseraccount-form-confirm-password": "The text used on the form label for the confirm password field.",
+	"migrateuseraccount-form-username": "The text used on the form label for the username field.",
+	"migrateuseraccount-form-username-help": "The help text used on the form label for the username field.",
+	"migrateuseraccount-migrated-log-entry": "The text used on the public log entry when a user migrates their account.",
+	"migrateuseraccount-success": "The message displayed when the account migration is successful.\nParameters:\n* $1 - Username",
+	"migrateuseraccount-failed": "The generic error message displayed if the account migration was not successful.",
+	"migrateuseraccount-invalid-password": "The error message displayed if the new password does not meet the wiki's requirements.",
+	"migrateuseraccount-wrong-confirm-password": "The error message displayed if the entered new password and confirmation of new password do not match."
+}

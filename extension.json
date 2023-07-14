@@ -26,14 +26,17 @@
 	"MessagesDirs": {
 		"MigrateUserAccount": "i18n"
 	},
+	"ExtensionMessagesFiles": {
+		"MigrateUserAccountAlias": "MigrateUserAccount.i18n.alias.php"
+	},
 	"ResourceModules": {
 		"ext.migrateuseraccount.styles": {
 			"styles": "ext.migrateuseraccount.styles.css"
 		}
 	},
 	"ResourceFileModulePaths": {
-		"localBasePath": "includes/modules",
-		"remoteExtPath": "MigrateUserAccount/includes/modules"
+		"localBasePath": "modules",
+		"remoteExtPath": "MigrateUserAccount/modules"
 	},
 	"Hooks": {
 		"SpecialPageBeforeExecute": "main"

@@ -40,6 +40,9 @@ This extension can be configured using the `LocalSettings.php` file in your Medi
 | `$wgMUAOverrideLoginPrompt`   | bool   | Whether the default `MediaWiki:Loginprompt` message on Special:Login should be overriden with a message directing users to migrate their accounts if necessary *(if you prefer, set this to false and set your own message in `MediaWiki:Loginprompt` on your wiki)* | `true`  |
 | `$wgMUALogToWiki`             | bool   | Whether we should log to a public log on `Special:Log` when a user migrates their account                                                                                                                                                                            | `true`  |
 
+## Debugging
+This extension logs to the channel `MigrateUserAccount`.
+
 ## License
 
 This extension is licensed under GPLv3 - [see the license file](/LICENSE).

@@ -24,8 +24,10 @@ use ErrorPageError;
 use HTMLForm;
 use LogPage;
 use MediaWiki\Html\Html;
+use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Session\Session;
+use Psr\Log\LoggerInterface;
 use SpecialPage;
 use User;
 
@@ -36,7 +38,15 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 */
 	private $session;
 
+	/**
+	 * @var string
+	 */
 	private $username;
+
+	/**
+	 * @var LoggerInterface
+	 */
+	private $logger;
 
 	public function __construct() {
 		parent::__construct( 'MigrateUserAccount' );
@@ -47,6 +57,8 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 * @return void
 	 */
 	public function execute( $par ) {
+		$this->logger = LoggerFactory::getInstance( 'MigrateUserAccount' );
+
 		$this->checkReadOnly();
 		$this->getOutput()->enableOOUI();
 		$this->getOutput()->addModuleStyles( [ 'ext.migrateuseraccount.styles' ] );
@@ -93,6 +105,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$form
 			->setFormIdentifier( 'form1' )
 			->setSubmitCallback( static function () {
+
 			} )
 			->show();
 	}
@@ -173,6 +186,10 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		// Generate a token
 		$token = $this->generateToken();
 
+		$this->logger->debug( $user->getName() . ' generated a new migration token for ' .
+			$this->getConfig()->get( 'MUARemoteWikiAPI' )
+		);
+
 		// Check if user has edited their page with the token (will either be `true` or a string to an error msg)
 		$verified = $this->verifyToken( $token );
 
@@ -217,6 +234,10 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			] );
 
 			if ( !$status->isGood() ) {
+				$this->logger->error( $user->getName() . ' failed to migrate their account from ' .
+					$this->getConfig()->get( 'MUARemoteWikiAPI' ) . ': ' . $status->getMessage()->text()
+				);
+
 				$this->getOutput()->addHTML(
 					Html::errorBox(
 						$this->msg( 'migrateuseraccount-failed' )->text()
@@ -225,6 +246,10 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				$this->showFinalForm();
 				return true;
 			}
+
+			$this->logger->info( $user->getName() . ' has migrated their account successfully from ' .
+				$this->getConfig()->get( 'MUARemoteWikiAPI' )
+			);
 
 			// Password change was successful by this point :)
 			$this->getOutput()->addHTML(
@@ -323,6 +348,8 @@ class SpecialMigrateUserAccount extends SpecialPage {
 					}
 				}
 			}
+		} else {
+			$this->logger->error( 'Got an invalid response from ' . $url);
 		}
 
 		// If the token is present in the text we're testing, then this was successful
