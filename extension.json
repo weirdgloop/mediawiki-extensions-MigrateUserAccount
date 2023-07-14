@@ -1,0 +1,59 @@
+{
+	"name": "MigrateUserAccount",
+	"version": "1.0.0",
+	"author": [
+		"[https://github.com/jayktaylor Jayden Bailey]",
+		"..."
+	],
+	"descriptionmsg": "migrateuseraccount-desc",
+	"license-name": "GPL-3.0-or-later",
+	"type": "specialpage",
+	"requires": {
+		"MediaWiki": ">= 1.35.0"
+	},
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\MigrateUserAccount\\": "includes/"
+	},
+	"LogActions": {
+		"newusers/migrated": "migrateuseraccount-migrated-log-entry"
+	},
+	"SpecialPages": {
+		"MigrateUserAccount": {
+			"class": "MediaWiki\\Extension\\MigrateUserAccount\\SpecialMigrateUserAccount"
+		}
+	},
+	"MessagesDirs": {
+		"MigrateUserAccount": "i18n"
+	},
+	"ResourceModules": {
+		"ext.migrateuseraccount.styles": {
+			"styles": "ext.migrateuseraccount.styles.css"
+		}
+	},
+	"ResourceFileModulePaths": {
+		"localBasePath": "includes/modules",
+		"remoteExtPath": "MigrateUserAccount/includes/modules"
+	},
+	"Hooks": {
+		"MessageCacheFetchOverrides": "MediaWiki\\Extension\\MigrateUserAccount\\MigrateUserAccountHooks::onMessageCacheFetchOverrides"
+	},
+	"config_prefix": "wgMUA",
+	"config": {
+		"OverrideLoginPrompt": {
+			"value": true
+		},
+		"TokenSecret": {
+			"value": ""
+		},
+		"RemoteWikiContentPath": {
+			"value": ""
+		},
+		"RemoteWikiAPI": {
+			"value": ""
+		},
+		"LogToWiki": {
+			"value": true
+		}
+	},
+	"manifest_version": 2
+}

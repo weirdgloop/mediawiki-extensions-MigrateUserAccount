@@ -1,0 +1,11 @@
+.mua-token-details {
+	border: 1px solid #c8c8c8;
+	padding: 1em;
+	margin: 1em 0 0;
+	border-radius: 5px;
+}
+
+.mua-token-details h3 {
+	margin: 0 !important;
+	padding: 0 !important;
+}
