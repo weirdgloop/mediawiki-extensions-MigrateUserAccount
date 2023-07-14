@@ -16,10 +16,12 @@
 	"migrateuseraccount-token-button": "I've added the token",
 	"migrateuseraccount-token-retry": "We could not find the token in the content or edit summary of the most recent edit on the page. Please ensure that you are logged in.",
 	"migrateuseraccount-form-password": "New password",
+	"migrateuseraccount-form-confirm-password": "Confirm new password",
 	"migrateuseraccount-form-username": "Username",
 	"migrateuseraccount-form-username-help": "This is the account you'd like to migrate from the old wiki.",
 	"migrateuseraccount-migrated-log-entry": "migrated their account",
 	"migrateuseraccount-success": "Your account has been migrated. You can now [[Special:UserLogin|login]] with your username \"$1\" and your chosen password.",
 	"migrateuseraccount-failed": "There was a problem migrating your account. Please try again later.",
-	"migrateuseraccount-invalid-password": "The password you provided is not valid. Please ensure that it meets the requirements for this wiki."
+	"migrateuseraccount-invalid-password": "The password you provided is not valid. Please ensure that it meets the requirements for this wiki.",
+	"migrateuseraccount-wrong-confirm-password": "The passwords you entered do not match."
 }

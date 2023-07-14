@@ -80,6 +80,11 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				'label-message' => 'migrateuseraccount-form-password',
 				'help-message' => 'migrateuseraccount-form-password-help',
 				'required' => true
+			],
+			'confirmpassword' => [
+				'type' => 'password',
+				'label-message' => 'migrateuseraccount-form-confirm-password',
+				'required' => true
 			]
 		];
 
@@ -128,12 +133,19 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	public function showTokenDetails() {
 		$vals = $this->getRequest()->getValues();
 
-		if ( !array_key_exists( 'wpusername', $vals ) || !array_key_exists( 'wppassword', $vals ) ) {
-			throw new BadRequestError( 'migrateuseraccount', '' );
-		}
-
 		$username = $vals['wpusername'];
 		$password = $vals['wppassword'];
+		$confirmPassword = $vals['wpconfirmpassword'];
+
+		if ( $password !== $confirmPassword ) {
+			$this->getOutput()->addHTML(
+				Html::errorBox(
+					$this->msg( 'migrateuseraccount-wrong-confirm-password' )->text()
+				)
+			);
+			$this->showForm();
+			return true;
+		}
 
 		$user = MediaWikiServices::getInstance()->getUserFactory()->newFromName( $username );
 
@@ -205,6 +217,10 @@ class SpecialMigrateUserAccount extends SpecialPage {
 					'default' => $username
 				],
 				'password' => [
+					'class' => 'HTMLHiddenField',
+					'default' => $password
+				],
+				'confirmpassword' => [
 					'class' => 'HTMLHiddenField',
 					'default' => $password
 				]
