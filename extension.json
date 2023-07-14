@@ -36,7 +36,15 @@
 		"remoteExtPath": "MigrateUserAccount/includes/modules"
 	},
 	"Hooks": {
-		"MessageCacheFetchOverrides": "MediaWiki\\Extension\\MigrateUserAccount\\MigrateUserAccountHooks::onMessageCacheFetchOverrides"
+		"SpecialPageBeforeExecute": "main"
+	},
+	"HookHandlers": {
+		"main": {
+			"class": "MediaWiki\\Extension\\MigrateUserAccount\\MigrateUserAccountHooks",
+			"services": [
+				"MainConfig"
+			]
+		}
 	},
 	"config_prefix": "wgMUA",
 	"config": {

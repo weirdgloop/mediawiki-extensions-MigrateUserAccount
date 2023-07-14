@@ -17,17 +17,28 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+namespace MediaWiki\Extension\MigrateUserAccount;
+
+use SpecialPage;
+
 class MigrateUserAccountHooks {
 	/**
-	 * @param array &$keys
+	 * @param SpecialPage $special
 	 * @return void
 	 */
-	public static function onMessageCacheFetchOverrides( array &$keys ) {
+	public static function onSpecialPageBeforeExecute( SpecialPage $special ) {
 		global $wgMUAOverrideLoginPrompt;
 		if ( !$wgMUAOverrideLoginPrompt ) {
 			return;
 		}
 
-		$keys["loginprompt"] = "migrateuseraccount-loginprompt";
+		$special->getOutput()->addModuleStyles( [ 'ext.migrateuseraccount.styles' ] );
+
+		$name = $special->getName();
+
+		if ( $name === 'Userlogin' || $name === 'CreateAccount' ) {
+			$special->getOutput()->addHTML( '<div class="mua-notice">' .
+				$special->msg( 'migrateuseraccount-loginprompt' ) . '</div>' );
+		}
 	}
 }

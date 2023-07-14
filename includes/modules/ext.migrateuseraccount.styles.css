@@ -9,3 +9,10 @@
 	margin: 0 !important;
 	padding: 0 !important;
 }
+
+.mua-notice {
+	border: 1px solid #c8c8c8;
+	padding: 1em;
+	margin: 1em 0;
+	border-radius: 5px;
+}
