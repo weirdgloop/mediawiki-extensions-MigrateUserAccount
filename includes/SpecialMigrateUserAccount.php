@@ -20,7 +20,6 @@
 
 namespace MediaWiki\Extension\MigrateUserAccount;
 
-use BadRequestError;
 use ErrorPageError;
 use HTMLForm;
 use LogPage;
@@ -179,10 +178,10 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		// Generate a token
 		$token = $this->generateToken( $username, $this->session->getId() );
 
-		// Check if user has edited their page with the token
+		// Check if user has edited their page with the token (will either be `true` or a string to an error msg)
 		$verified = $this->verifyToken( $username, $token );
 
-		if ( $verified ) {
+		if ( $verified === true ) {
 			// Change user's credentials
 			$status = $user->changeAuthenticationData( [
 				'password' => $password,
@@ -247,7 +246,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			if ( $vals['wpFormIdentifier'] == 'form2' ) {
 				// If we're here after the second form, it should be because we retried and it didn't work.
 				$this->getOutput()->addHTML( '<br />' . Html::errorBox(
-						$this->msg( 'migrateuseraccount-token-retry' )
+						$this->msg( $verified )
 					) );
 			}
 		}
@@ -256,15 +255,15 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	/**
 	 * @param string $username
 	 * @param string $token
-	 * @return bool
+	 * @return bool|string
 	 */
-	private function verifyToken( string $username, string $token ): bool {
+	private function verifyToken( string $username, string $token ) {
 		$un = rawurlencode( $username );
 		$textToTest = '';
 
 		$url = $this->getConfig()->get( 'MUARemoteWikiAPI' ) .
-			'?format=json&formatversion=2&action=query&prop=revisions&titles=User:' . $un . '&rvuser=' .
-			$un . '&rvprop=comment|content&rvlimit=1&rvslots=main';
+			'?format=json&formatversion=2&action=query&prop=revisions&titles=User:' . $un .
+			'&rvprop=comment|content|timestamp|user&rvlimit=1&rvslots=main';
 		$res = MediaWikiServices::getInstance()->getHttpRequestFactory()->get( $url );
 
 		if ( $res ) {
@@ -277,6 +276,21 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				// Get the first revision
 				if ( isset( $firstPage['revisions'] ) ) {
 					$revision = current( $firstPage['revisions'] );
+
+					// If the most recent edit was more than 10 minutes ago, show a special error message
+					if ( isset( $revision['timestamp'] ) ) {
+						$currTimestamp = time();
+						$editTimestamp = strtotime( $revision['timestamp'] );
+
+						if ( $editTimestamp && ( $editTimestamp < ( $currTimestamp - 10 * 60 ) ) ) {
+							return 'migrateuseraccount-token-no-recent-edit';
+						}
+					}
+
+					// If the username of the most recent edit is not the target user, show a special error message
+					if ( !isset( $revision['user'] ) || $revision['user'] !== $username ) {
+						return 'migrateuseraccount-token-username-no-match';
+					}
 
 					// Get the slots (for the revision content)
 					if ( isset( $revision['slots'] ) ) {
@@ -295,7 +309,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		if ( str_contains( $textToTest, $token ) ) {
 			return true;
 		} else {
-			return false;
+			return 'migrateuseraccount-token-no-token';
 		}
 	}
 
