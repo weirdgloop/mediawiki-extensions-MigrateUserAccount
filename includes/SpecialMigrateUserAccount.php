@@ -149,7 +149,8 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		}
 
 		$canMigrate = $this->checkUserCanMigrate( $username );
-		if ( !$canMigrate ) { return true;
+		if ( !$canMigrate ) {
+			return true;
 		}
 
 		// Generate a token
@@ -188,13 +189,14 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			return true;
 		} else {
+			$remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" . $username . "?action=edit";
+
 			// If they have not edited their page, show information on how to verify their identity
 			$this->getOutput()->addHTML(
 				'<div class="mua-token-details"><h3>' . $this->msg( 'migrateuseraccount-token-title',
 				$username, '<code>' . $token . '</code>' ) . '</h3><br />' .
 				$this->msg( 'migrateuseraccount-token-help',
-				$this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" .
-				$username . "?action=edit" ) . '</div><br />'
+				$remoteUrl ) . '</div><br />'
 			);
 
 			$desc = [
@@ -231,28 +233,39 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 */
 	private function verifyToken( string $username, string $token ): bool {
 		$un = rawurlencode( $username );
-		$comment = null;
+		$textToTest = '';
 
 		$url = $this->getConfig()->get( 'MUARemoteWikiAPI' ) .
 			'?format=json&formatversion=2&action=query&prop=revisions&titles=User:' . $un . '&rvuser=' .
-			$un . '&rvprop=comment&rvlimit=1';
+			$un . '&rvprop=comment|content&rvlimit=1&rvslots=main';
 		$res = MediaWikiServices::getInstance()->getHttpRequestFactory()->get( $url );
 
 		if ( $res ) {
 			$data = json_decode( $res, true );
+
+			// Get the first page
 			if ( isset( $data['query']['pages'] ) ) {
 				$firstPage = current( $data['query']['pages'] );
 
+				// Get the first revision
 				if ( isset( $firstPage['revisions'] ) ) {
 					$revision = current( $firstPage['revisions'] );
+
+					// Get the slots (for the revision content)
+					if ( isset( $revision['slots'] ) ) {
+						$textToTest = $textToTest . trim( $revision['slots']['main']['content'] );
+					}
+
+					// Get the edit summary
 					if ( isset( $revision['comment'] ) ) {
-						$comment = trim( $revision['comment'] );
+						$textToTest = $textToTest . trim( $revision['comment'] );
 					}
 				}
 			}
 		}
 
-		if ( $comment === $token ) {
+		// If the token is present in the text we're testing, then this was successful
+		if ( str_contains( $textToTest, $token ) ) {
 			return true;
 		} else {
 			return false;
