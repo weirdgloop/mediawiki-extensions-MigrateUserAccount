@@ -105,7 +105,6 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$form
 			->setFormIdentifier( 'form1' )
 			->setSubmitCallback( static function () {
-
 			} )
 			->show();
 	}
@@ -146,7 +145,8 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	public function checkUserCanMigrate(): bool {
 		// Ensure that the user is a stub (has no password set) before continuing
 		$dbr = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_REPLICA );
-		$row = $dbr->selectRow( 'user', [ 'user_id', 'user_password' ], [ 'user_name' => $this->username ], __METHOD__ );
+		$row = $dbr->selectRow( 'user', [ 'user_id', 'user_password' ], [ 'user_name' => $this->username ],
+			__METHOD__ );
 		if ( !$row || $row->user_password != '' ) {
 			$this->getOutput()->addHTML(
 				Html::errorBox(
@@ -259,13 +259,14 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			);
 
 			// Save to the on-wiki log, if enabled
-			if ( $this->getConfig()->get('MUALogToWiki') ) {
+			if ( $this->getConfig()->get( 'MUALogToWiki' ) ) {
 				$this->saveToLog( $user );
 			}
 
 			return true;
 		} else {
-			$remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" . $this->username . "?action=edit";
+			$remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" . $this->username .
+				"?action=edit";
 
 			// If they have not edited their page, show information on how to verify their identity
 			$this->getOutput()->addHTML(
@@ -349,7 +350,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				}
 			}
 		} else {
-			$this->logger->error( 'Got an invalid response from ' . $url);
+			$this->logger->error( 'Got an invalid response from ' . $url );
 		}
 
 		// If the token is present in the text we're testing, then this was successful
