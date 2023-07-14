@@ -23,7 +23,6 @@ namespace MediaWiki\Extension\MigrateUserAccount;
 use ErrorPageError;
 use HTMLForm;
 use LogPage;
-use MediaWiki\Html\Html;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Session\Session;
@@ -62,7 +61,10 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$this->checkReadOnly();
 		$this->getOutput()->enableOOUI();
 		$this->getOutput()->addModuleStyles( [ 'ext.migrateuseraccount.styles' ] );
-		$this->getOutput()->disableClientCache();
+
+		if ( version_compare( MW_VERSION, '1.38', '>=' ) ) {
+			$this->getOutput()->disableClientCache();
+		}
 
 		// Persist a session, so that we can use the ID for hashing later
 		$this->session = $this->getRequest()->getSession();
@@ -149,7 +151,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			__METHOD__ );
 		if ( !$row || $row->user_password != '' ) {
 			$this->getOutput()->addHTML(
-				Html::errorBox(
+				\Html::errorBox(
 					$this->msg( 'migrateuseraccount-error-invalid-user' )->text()
 				)
 			);
@@ -208,7 +210,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			// Check that both passwords match
 			if ( $password !== $confirmPassword ) {
 				$this->getOutput()->addHTML(
-					Html::errorBox(
+					\Html::errorBox(
 						$this->msg( 'migrateuseraccount-wrong-confirm-password' )->text()
 					)
 				);
@@ -219,7 +221,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			// Check if the password they provided is actually valid or not
 			if ( !$user->isValidPassword( $password ) ) {
 				$this->getOutput()->addHTML(
-					Html::errorBox(
+					\Html::errorBox(
 						$this->msg( 'migrateuseraccount-invalid-password' )->text()
 					)
 				);
@@ -239,7 +241,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				);
 
 				$this->getOutput()->addHTML(
-					Html::errorBox(
+					\Html::errorBox(
 						$this->msg( 'migrateuseraccount-failed' )->text()
 					)
 				);
@@ -253,7 +255,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			// Password change was successful by this point :)
 			$this->getOutput()->addHTML(
-				Html::successBox(
+				\Html::successBox(
 					$this->msg( 'migrateuseraccount-success', $this->username )
 				)
 			);
@@ -292,7 +294,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			if ( $vals['wpFormIdentifier'] == 'form2' ) {
 				// If we're here after the second form, it should be because we retried and it didn't work.
-				$this->getOutput()->addHTML( '<br />' . Html::errorBox(
+				$this->getOutput()->addHTML( '<br />' . \Html::errorBox(
 						$this->msg( $verified )
 					) );
 			}
