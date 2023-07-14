@@ -26,10 +26,17 @@ use HTMLForm;
 use LogPage;
 use MediaWiki\Html\Html;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\Session\Session;
 use SpecialPage;
 use User;
 
 class SpecialMigrateUserAccount extends SpecialPage {
+
+	/**
+	 * @var Session
+	 */
+	private $session;
+
 	public function __construct() {
 		parent::__construct( 'MigrateUserAccount' );
 	}
@@ -43,6 +50,10 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$this->getOutput()->enableOOUI();
 		$this->getOutput()->addModuleStyles( [ 'ext.migrateuseraccount.styles' ] );
 		$this->getOutput()->disableClientCache();
+
+		// Persist a session, so that we can use the ID for hashing later
+		$this->session = $this->getRequest()->getSession();
+		$this->session->persist();
 
 		$user = $this->getUser();
 
@@ -118,12 +129,12 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 	/**
 	 * @param string $username
-	 * @param string $password
+	 * @param string $sessionToken
 	 * @return string
 	 */
-	public function generateToken( string $username, string $password ): string {
+	public function generateToken( string $username, string $sessionToken ): string {
 		$secret = pack( 'H*', $this->getConfig()->get( 'MUATokenSecret' ) );
-		$token = hash_hmac( 'sha256', $username . ':' . $password, $secret );
+		$token = hash_hmac( 'sha256', $username . ':' . $sessionToken, $secret );
 		return base64_encode( pack( 'H*', substr( $token, 0, 16 ) ) );
 	}
 
@@ -166,7 +177,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		}
 
 		// Generate a token
-		$token = $this->generateToken( $username, $password );
+		$token = $this->generateToken( $username, $this->session->getId() );
 
 		// Check if user has edited their page with the token
 		$verified = $this->verifyToken( $username, $token );
