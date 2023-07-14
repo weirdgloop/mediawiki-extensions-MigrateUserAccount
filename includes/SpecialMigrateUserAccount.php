@@ -152,7 +152,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		if ( !$row || $row->user_password != '' ) {
 			$this->getOutput()->addHTML(
 				\Html::errorBox(
-					$this->msg( 'migrateuseraccount-error-invalid-user' )->text()
+					$this->msg( 'migrateuseraccount-error-user-' . ( !$row ? 'nonexistent' : 'migrated' ) )->text()
 				)
 			);
 			$this->showForm();
