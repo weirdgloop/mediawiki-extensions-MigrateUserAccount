@@ -51,7 +51,7 @@
 	},
 	"config_prefix": "wgMUA",
 	"config": {
-		"OverrideLoginPrompt": {
+		"ShowNoticeOnLogin": {
 			"value": true
 		},
 		"TokenSecret": {

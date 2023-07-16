@@ -27,16 +27,15 @@ class MigrateUserAccountHooks {
 	 * @return void
 	 */
 	public static function onSpecialPageBeforeExecute( SpecialPage $special ) {
-		global $wgMUAOverrideLoginPrompt;
-		if ( !$wgMUAOverrideLoginPrompt ) {
+		global $wgMUAShowNoticeOnLogin;
+		if ( !$wgMUAShowNoticeOnLogin ) {
 			return;
 		}
-
-		$special->getOutput()->addModuleStyles( [ 'ext.migrateuseraccount.styles' ] );
 
 		$name = $special->getName();
 
 		if ( $name === 'Userlogin' || $name === 'CreateAccount' ) {
+			$special->getOutput()->addModuleStyles( [ 'ext.migrateuseraccount.styles' ] );
 			$special->getOutput()->addHTML( '<div class="mua-notice">' .
 				$special->msg( 'migrateuseraccount-loginprompt' ) . '</div>' );
 		}
