@@ -47,6 +47,11 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 */
 	private $logger;
 
+	/**
+	 * @var string
+	 */
+	private string $remoteUrl;
+
 	public function __construct() {
 		parent::__construct( 'MigrateUserAccount' );
 	}
@@ -177,6 +182,8 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$vals = $this->getRequest()->getValues();
 
 		$this->username = $vals['wpusername'];
+		$this->remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" . $this->username .
+			"?action=edit";
 
 		$user = MediaWikiServices::getInstance()->getUserFactory()->newFromName( $this->username );
 
@@ -267,15 +274,12 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			return true;
 		} else {
-			$remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" . $this->username .
-				"?action=edit";
-
 			// If they have not edited their page, show information on how to verify their identity
 			$this->getOutput()->addHTML(
 				'<div class="mua-token-details"><h3>' . $this->msg( 'migrateuseraccount-token-title',
 				$this->username, '<code>' . $token . '</code>' ) . '</h3><br />' .
 				$this->msg( 'migrateuseraccount-token-help',
-				$remoteUrl ) . '</div><br />'
+				$this->remoteUrl ) . '</div><br />'
 			);
 
 			$desc = [
@@ -295,8 +299,8 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			if ( $vals['wpFormIdentifier'] == 'form2' ) {
 				// If we're here after the second form, it should be because we retried and it didn't work.
 				$this->getOutput()->addHTML( '<br />' . \Html::errorBox(
-						$this->msg( $verified )
-					) );
+					$verified
+				) );
 			}
 		}
 	}
@@ -331,13 +335,15 @@ class SpecialMigrateUserAccount extends SpecialPage {
 						$editTimestamp = strtotime( $revision['timestamp'] );
 
 						if ( $editTimestamp && ( $editTimestamp < ( $currTimestamp - 10 * 60 ) ) ) {
-							return 'migrateuseraccount-token-no-recent-edit';
+							return $this->getOutput()->msg( 'migrateuseraccount-token-no-recent-edit',
+								'[' . $this->remoteUrl . ' ' . $this->username . ']' );
 						}
 					}
 
 					// If the username of the most recent edit is not the target user, show a special error message
 					if ( !isset( $revision['user'] ) || $revision['user'] !== $this->username ) {
-						return 'migrateuseraccount-token-username-no-match';
+						return $this->getOutput()->msg( 'migrateuseraccount-token-username-no-match',
+							'[' . $this->remoteUrl . ' ' . $this->username . ']' );
 					}
 
 					// Get the slots (for the revision content)
@@ -359,7 +365,8 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		if ( str_contains( $textToTest, $token ) ) {
 			return true;
 		} else {
-			return 'migrateuseraccount-token-no-token';
+			return $this->getOutput()->msg( 'migrateuseraccount-token-no-token',
+				'[' . $this->remoteUrl . ' ' . $this->username . ']' );
 		}
 	}
 
