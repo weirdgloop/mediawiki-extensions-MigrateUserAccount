@@ -43,6 +43,11 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	private $username;
 
 	/**
+	 * @var User
+	 */
+	private $user;
+
+	/**
 	 * @var LoggerInterface
 	 */
 	private $logger;
@@ -154,7 +159,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	public function checkUserCanMigrate(): bool {
 		// Ensure that the user is a stub (has no password set) before continuing
 		$dbr = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_REPLICA );
-		$row = $dbr->selectRow( 'user', [ 'user_id', 'user_password' ], [ 'user_name' => $this->username ],
+		$row = $dbr->selectRow( 'user', [ 'user_id', 'user_password' ], [ 'user_name' => $this->user->getName() ],
 			__METHOD__ );
 		if ( !$row || $row->user_password != '' ) {
 			$this->getOutput()->addHTML(
@@ -173,7 +178,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 */
 	public function generateToken(): string {
 		$secret = pack( 'H*', $this->getConfig()->get( 'MUATokenSecret' ) );
-		$token = hash_hmac( 'sha256', $this->username . ':' . $this->session->getId(), $secret );
+		$token = hash_hmac( 'sha256', $this->user->getName() . ':' . $this->session->getId(), $secret );
 		return base64_encode( pack( 'H*', substr( $token, 0, 16 ) ) );
 	}
 
@@ -184,10 +189,9 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$vals = $this->getRequest()->getValues();
 
 		$this->username = $vals['wpusername'];
-		$this->remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" . $this->username .
+		$this->user = MediaWikiServices::getInstance()->getUserFactory()->newFromName( $this->username );
+		$this->remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" . $this->user->getName() .
 			"?action=edit";
-
-		$user = MediaWikiServices::getInstance()->getUserFactory()->newFromName( $this->username );
 
 		$canMigrate = $this->checkUserCanMigrate();
 		if ( !$canMigrate ) {
@@ -197,7 +201,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		// Generate a token
 		$token = $this->generateToken();
 
-		$this->logger->debug( $user->getName() . ' generated a new migration token for ' .
+		$this->logger->debug( $this->user->getName() . ' generated a new migration token for ' .
 			$this->getConfig()->get( 'MUARemoteWikiAPI' )
 		);
 
@@ -227,7 +231,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				return true;
 			}
 
-			if ( !$user->isValidPassword( $password ) ) {
+			if ( !$this->user->isValidPassword( $password ) ) {
 				$this->getOutput()->addHTML(
 					\Html::errorBox(
 						$this->msg( 'migrateuseraccount-invalid-password' )->text()
@@ -238,13 +242,13 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			}
 
 			// Change user's credentials
-			$status = $user->changeAuthenticationData( [
+			$status = $this->user->changeAuthenticationData( [
 				'password' => $password,
 				'retype' => $password
 			] );
 
 			if ( !$status->isGood() ) {
-				$this->logger->error( $user->getName() . ' failed to migrate their account from ' .
+				$this->logger->error( $this->user->getName() . ' failed to migrate their account from ' .
 					$this->getConfig()->get( 'MUARemoteWikiAPI' ) . ': ' . $status->getMessage()->text()
 				);
 
@@ -257,20 +261,20 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				return true;
 			}
 
-			$this->logger->info( $user->getName() . ' has migrated their account successfully from ' .
+			$this->logger->info( $this->user->getName() . ' has migrated their account successfully from ' .
 				$this->getConfig()->get( 'MUARemoteWikiAPI' )
 			);
 
 			// Password change was successful by this point :)
 			$this->getOutput()->addHTML(
 				\Html::successBox(
-					$this->msg( 'migrateuseraccount-success', $this->username )
+					$this->msg( 'migrateuseraccount-success', $this->user->getName() )
 				)
 			);
 
 			// Save to the on-wiki log, if enabled
 			if ( $this->getConfig()->get( 'MUALogToWiki' ) ) {
-				$this->saveToLog( $user );
+				$this->saveToLog( $this->user );
 			}
 
 			return true;
@@ -278,15 +282,15 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			// If they have not edited their page, show information on how to verify their identity
 			$this->getOutput()->addHTML(
 				'<div class="mua-token-details"><h3>' . $this->msg( 'migrateuseraccount-token-title',
-				$this->username, '<code>' . $token . '</code>' ) . '</h3><br />' .
+					$this->user->getName(), '<code>' . $token . '</code>' ) . '</h3><br />' .
 				$this->msg( 'migrateuseraccount-token-help',
-				$this->remoteUrl ) . '</div><br />'
+					$this->remoteUrl ) . '</div><br />'
 			);
 
 			$desc = [
 				'username' => [
 					'class' => 'HTMLHiddenField',
-					'default' => $this->username
+					'default' => $this->user->getName()
 				],
 			];
 			$form = HTMLForm::factory( 'ooui', $desc, $this->getContext() );
@@ -300,8 +304,8 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			if ( $vals['wpFormIdentifier'] == 'form2' ) {
 				// If we're here after the second form, it should be because we retried and it didn't work.
 				$this->getOutput()->addHTML( '<br />' . \Html::errorBox(
-					$verified
-				) );
+						$verified
+					) );
 			}
 		}
 	}
@@ -311,7 +315,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 * @return bool|string
 	 */
 	private function verifyToken( string $token ) {
-		$un = rawurlencode( $this->username );
+		$un = rawurlencode( $this->user->getName() );
 		$textToTest = '';
 
 		$url = $this->getConfig()->get( 'MUARemoteWikiAPI' ) .
@@ -337,14 +341,14 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 						if ( $editTimestamp && ( $editTimestamp < ( $currTimestamp - 10 * 60 ) ) ) {
 							return $this->getOutput()->msg( 'migrateuseraccount-token-no-recent-edit',
-								'[' . $this->remoteUrl . ' ' . $this->username . ']' );
+								'[' . $this->remoteUrl . ' ' . $this->user->getName() . ']' );
 						}
 					}
 
 					// If the username of the most recent edit is not the target user, show a special error message
-					if ( !isset( $revision['user'] ) || $revision['user'] !== $this->username ) {
+					if ( !isset( $revision['user'] ) || $revision['user'] !== $this->user->getName() ) {
 						return $this->getOutput()->msg( 'migrateuseraccount-token-username-no-match',
-							'[' . $this->remoteUrl . ' ' . $this->username . ']' );
+							'[' . $this->remoteUrl . ' ' . $this->user->getName() . ']' );
 					}
 
 					// Get the slots (for the revision content)
@@ -367,7 +371,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			return true;
 		} else {
 			return $this->getOutput()->msg( 'migrateuseraccount-token-no-token',
-				'[' . $this->remoteUrl . ' ' . $this->username . ']' );
+				'[' . $this->remoteUrl . ' ' . $this->user->getName() . ']' );
 		}
 	}
 
