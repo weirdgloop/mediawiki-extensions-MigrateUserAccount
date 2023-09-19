@@ -65,6 +65,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 		$this->checkReadOnly();
 		$this->getOutput()->enableOOUI();
+		$this->getOutput()->addModules( 'special.migrateuseraccount' );
 		$this->getOutput()->addModuleStyles( [ 'ext.migrateuseraccount.styles' ] );
 
 		if ( version_compare( MW_VERSION, '1.38', '>=' ) ) {
@@ -129,6 +130,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				'type' => 'password',
 				'label-message' => 'migrateuseraccount-form-password',
 				'help-message' => 'migrateuseraccount-form-password-help',
+				'cssclass' => 'mw-migrateuseraccount-validate-password',
 				'required' => true
 			],
 			'confirmpassword' => [
@@ -225,7 +227,6 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				return true;
 			}
 
-			// Check if the password they provided is actually valid or not
 			if ( !$user->isValidPassword( $password ) ) {
 				$this->getOutput()->addHTML(
 					\Html::errorBox(
