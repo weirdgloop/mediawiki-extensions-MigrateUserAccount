@@ -341,14 +341,14 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 						if ( $editTimestamp && ( $editTimestamp < ( $currTimestamp - 10 * 60 ) ) ) {
 							return $this->getOutput()->msg( 'migrateuseraccount-token-no-recent-edit',
-								'[' . $this->remoteUrl . ' ' . $this->user->getName() . ']' );
+								'[' . $this->remoteUrl . ' ' . urlencode( $this->user->getName() ) . ']' );
 						}
 					}
 
 					// If the username of the most recent edit is not the target user, show a special error message
 					if ( !isset( $revision['user'] ) || $revision['user'] !== $this->user->getName() ) {
 						return $this->getOutput()->msg( 'migrateuseraccount-token-username-no-match',
-							'[' . $this->remoteUrl . ' ' . $this->user->getName() . ']' );
+							'[' . $this->remoteUrl . ' ' . urlencode( $this->user->getName() ) . ']' );
 					}
 
 					// Get the slots (for the revision content)
@@ -371,7 +371,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			return true;
 		} else {
 			return $this->getOutput()->msg( 'migrateuseraccount-token-no-token',
-				'[' . $this->remoteUrl . ' ' . $this->user->getName() . ']' );
+				'[' . $this->remoteUrl . ' ' . urlencode( $this->user->getName() ) . ']' );
 		}
 	}
 
