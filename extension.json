@@ -1,6 +1,6 @@
 {
 	"name": "MigrateUserAccount",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"author": [
 		"[https://github.com/jayktaylor Jayden Bailey]",
 		"..."
@@ -32,6 +32,16 @@
 	"ResourceModules": {
 		"ext.migrateuseraccount.styles": {
 			"styles": "ext.migrateuseraccount.styles.css"
+		},
+		"special.migrateuseraccount": {
+			"packageFiles": [
+				"special.migrateuseraccount.js"
+			],
+			"dependencies": [
+				"oojs-ui-core",
+				"mediawiki.htmlform.ooui",
+				"mediawiki.api"
+			]
 		}
 	},
 	"ResourceFileModulePaths": {
@@ -65,6 +75,9 @@
 		},
 		"LogToWiki": {
 			"value": true
+		},
+		"FallbackSuffix": {
+			"value": ""
 		}
 	},
 	"manifest_version": 2

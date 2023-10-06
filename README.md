@@ -34,17 +34,17 @@ This extension can be configured using the `LocalSettings.php` file in your Medi
 
 | Variable                      | Type   | Description                                                                                                                                                                                                                           | Default |
 |-------------------------------|--------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|
-| `$wgMUATokenSecret` | hex | Hex string used as a secret during token generation                                                                                                                                                                                   | |
+| `$wgMUATokenSecret`           | hex    | Hex string used as a secret during token generation                                                                                                                                                                                   |         |
 | `$wgMUARemoteWikiContentPath` | string | URL to the remote wiki's content path (with trailing slash). For FANDOM sites, this is something like `https://community.fandom.com/wiki/`                                                                                            |         |
 | `$wgMUARemoteWikiAPI`         | string | URL to the remote wiki's API. For FANDOM sites, this is something like `https://community.fandom.com/api.php`                                                                                                                         |         |
-| `$wgMUAShowNoticeOnLogin`   | bool   | Whether to show a message directing users to migrate their accounts if necessary on Special:UserLogin and Special:CreateAccount *(if you prefer, set this to false and set your own message in `MediaWiki:Loginprompt` on your wiki)* | `true`  |
+| `$wgMUAShowNoticeOnLogin`     | bool   | Whether to show a message directing users to migrate their accounts if necessary on Special:UserLogin and Special:CreateAccount *(if you prefer, set this to false and set your own message in `MediaWiki:Loginprompt` on your wiki)* | `true`  |
 | `$wgMUALogToWiki`             | bool   | Whether we should log to a public log on `Special:Log` when a user migrates their account                                                                                                                                             | `true`  |
+There are some additional config variables that you can find in `extension.json`, but they should generally not be used outside of [Weird Gloop](https://weirdgloop.org) wikis.
 
 ## Debugging
 This extension logs to the channel `MigrateUserAccount`.
 
 ## License
-
 This extension is licensed under GPLv3 - [see the license file](/LICENSE).
 
 It is inspired by an extension called [UserMigration](https://gitlab.com/hydrawiki/extensions/usermigration/), which is no longer maintained. That project was maintained by foxlit, Alexia E. Smith (Curse Inc.), and others.

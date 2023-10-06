@@ -40,7 +40,9 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	/**
 	 * @var string
 	 */
-	private $username;
+	private $localUsername;
+
+	private $remoteUsername;
 
 	/**
 	 * @var LoggerInterface
@@ -52,8 +54,19 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 */
 	private string $remoteUrl;
 
+	private string $fallbackSuffix;
+
 	public function __construct() {
 		parent::__construct( 'MigrateUserAccount' );
+	}
+
+	/**
+	 * Whether or not we're using a fallback username. Used for Weird Gloop wikis.
+	 * This isn't relevant to external wikis utilising this extension.
+	 * @return bool
+	 */
+	private function isUsingFallback(): bool {
+		return $this->localUsername !== $this->remoteUsername;
 	}
 
 	/**
@@ -66,6 +79,8 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$this->checkReadOnly();
 		$this->getOutput()->enableOOUI();
 		$this->getOutput()->addModuleStyles( [ 'ext.migrateuseraccount.styles' ] );
+
+		$this->fallbackSuffix = $this->getConfig()->get( 'FallbackSuffix' );
 
 		if ( version_compare( MW_VERSION, '1.38', '>=' ) ) {
 			$this->getOutput()->disableClientCache();
@@ -111,8 +126,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$form = HTMLForm::factory( 'ooui', $desc, $this->getContext() );
 		$form
 			->setFormIdentifier( 'form1' )
-			->setSubmitCallback( static function () {
-			} )
+			->setSubmitCallback( static function () {} )
 			->show();
 	}
 
@@ -123,7 +137,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$desc = [
 			'username' => [
 				'class' => 'HTMLHiddenField',
-				'default' => $this->username
+				'default' => $this->remoteUsername
 			],
 			'password' => [
 				'type' => 'password',
@@ -138,6 +152,15 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			]
 		];
 
+		if ( $this->isUsingFallback() ) {
+			$desc['newusername'] = [
+				'class' => 'HTMLTextField',
+				'label-message' => 'migrateuseraccount-form-newusername',
+				'help-message' => 'migrateuseraccount-form-newusername-help',
+				'required' => true
+			];
+		}
+
 		$form = HTMLForm::factory( 'ooui', $desc, $this->getContext() );
 		$form
 			->setFormIdentifier( 'form3' )
@@ -150,19 +173,41 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 * @return bool
 	 */
 	public function checkUserCanMigrate(): bool {
-		// Ensure that the user is a stub (has no password set) before continuing
-		$dbr = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_REPLICA );
-		$row = $dbr->selectRow( 'user', [ 'user_id', 'user_password' ], [ 'user_name' => $this->username ],
-			__METHOD__ );
-		if ( !$row || $row->user_password != '' ) {
-			$this->getOutput()->addHTML(
-				\Html::errorBox(
-					$this->msg( 'migrateuseraccount-error-user-' . ( !$row ? 'nonexistent' : 'migrated' ) )->text()
-				)
-			);
-			$this->showForm();
-			return false;
+		$username = $this->localUsername;
+		$isFallback = false;
+
+		while ( true ) {
+			// Ensure that the user is a stub (has no password set) before continuing
+			$dbr = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_REPLICA );
+			$row = $dbr->selectRow( 'user', [ 'user_id', 'user_password' ], [ 'user_name' => $username ],
+				__METHOD__ );
+
+			if ( !$row || $row->user_password != '' ) {
+				// User is not a stub
+				if ( !empty( $this->fallbackSuffix && !$isFallback ) ) {
+					// If a fallback suffix is set, try again but with that suffix
+					$username = $username . $this->fallbackSuffix;
+					$isFallback = true;
+					continue;
+				}
+
+				// If a fallback suffix is not set, or we tried with the fallback suffix and no dice, show an error
+				$this->getOutput()->addHTML(
+					\Html::errorBox(
+						$this->msg( 'migrateuseraccount-error-user-' . ( !$row ? 'nonexistent' : 'migrated' ) )->text()
+					)
+				);
+				$this->showForm();
+				return false;
+			}
+
+			break;
 		}
+
+		if ( $isFallback ) {
+			$this->localUsername = $username;
+		}
+
 		return true;
 	}
 
@@ -171,26 +216,27 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 */
 	public function generateToken(): string {
 		$secret = pack( 'H*', $this->getConfig()->get( 'MUATokenSecret' ) );
-		$token = hash_hmac( 'sha256', $this->username . ':' . $this->session->getId(), $secret );
+		$token = hash_hmac( 'sha256', $this->remoteUsername . ':' . $this->session->getId(), $secret );
 		return base64_encode( pack( 'H*', substr( $token, 0, 16 ) ) );
 	}
 
 	/**
-	 * @return true|void
+	 * @return bool|void
 	 */
 	public function showTokenDetails() {
 		$vals = $this->getRequest()->getValues();
 
-		$this->username = $vals['wpusername'];
-		$this->remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" . $this->username .
+		$this->remoteUsername = $vals['wpusername'];
+		$this->remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" . $this->remoteUsername .
 			"?action=edit";
-
-		$user = MediaWikiServices::getInstance()->getUserFactory()->newFromName( $this->username );
 
 		$canMigrate = $this->checkUserCanMigrate();
 		if ( !$canMigrate ) {
-			return true;
+			// User cannot migrate, jump out
+			return false;
 		}
+
+		$user = MediaWikiServices::getInstance()->getUserFactory()->newFromName( $this->localUsername );
 
 		// Generate a token
 		$token = $this->generateToken();
@@ -260,10 +306,12 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				$this->getConfig()->get( 'MUARemoteWikiAPI' )
 			);
 
+			// TODO if remote un is different to local un, we must have fallen back at some point, so rename them(?)
+
 			// Password change was successful by this point :)
 			$this->getOutput()->addHTML(
 				\Html::successBox(
-					$this->msg( 'migrateuseraccount-success', $this->username )
+					$this->msg( 'migrateuseraccount-success', $this->localUsername )
 				)
 			);
 
@@ -277,7 +325,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			// If they have not edited their page, show information on how to verify their identity
 			$this->getOutput()->addHTML(
 				'<div class="mua-token-details"><h3>' . $this->msg( 'migrateuseraccount-token-title',
-				$this->username, '<code>' . $token . '</code>' ) . '</h3><br />' .
+				$this->remoteUsername, '<code>' . $token . '</code>' ) . '</h3><br />' .
 				$this->msg( 'migrateuseraccount-token-help',
 				$this->remoteUrl ) . '</div><br />'
 			);
@@ -285,7 +333,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			$desc = [
 				'username' => [
 					'class' => 'HTMLHiddenField',
-					'default' => $this->username
+					'default' => $this->remoteUsername
 				],
 			];
 			$form = HTMLForm::factory( 'ooui', $desc, $this->getContext() );
@@ -310,7 +358,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 * @return bool|string
 	 */
 	private function verifyToken( string $token ) {
-		$un = rawurlencode( $this->username );
+		$un = rawurlencode( $this->localUsername );
 		$textToTest = '';
 
 		$url = $this->getConfig()->get( 'MUARemoteWikiAPI' ) .
@@ -336,14 +384,14 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 						if ( $editTimestamp && ( $editTimestamp < ( $currTimestamp - 10 * 60 ) ) ) {
 							return $this->getOutput()->msg( 'migrateuseraccount-token-no-recent-edit',
-								'[' . $this->remoteUrl . ' ' . $this->username . ']' );
+								'[' . $this->remoteUrl . ' ' . $this->remoteUsername . ']' );
 						}
 					}
 
 					// If the username of the most recent edit is not the target user, show a special error message
-					if ( !isset( $revision['user'] ) || $revision['user'] !== $this->username ) {
+					if ( !isset( $revision['user'] ) || $revision['user'] !== $this->remoteUsername ) {
 						return $this->getOutput()->msg( 'migrateuseraccount-token-username-no-match',
-							'[' . $this->remoteUrl . ' ' . $this->username . ']' );
+							'[' . $this->remoteUrl . ' ' . $this->remoteUsername . ']' );
 					}
 
 					// Get the slots (for the revision content)
@@ -366,7 +414,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			return true;
 		} else {
 			return $this->getOutput()->msg( 'migrateuseraccount-token-no-token',
-				'[' . $this->remoteUrl . ' ' . $this->username . ']' );
+				'[' . $this->remoteUrl . ' ' . $this->remoteUsername . ']' );
 		}
 	}
 

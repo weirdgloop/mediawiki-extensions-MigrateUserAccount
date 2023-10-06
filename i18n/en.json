@@ -22,6 +22,8 @@
 	"migrateuseraccount-form-confirm-password": "Confirm new password",
 	"migrateuseraccount-form-username": "Username",
 	"migrateuseraccount-form-username-help": "This is the account you'd like to migrate from the old wiki.",
+	"migrateuseraccount-form-newusername": "New username",
+	"migrateuseraccount-form-newusername-help": "A user with the username '''$1''' already exists. Please enter a different username you would like to use on this wiki.",
 	"migrateuseraccount-migrated-log-entry": "migrated their account",
 	"migrateuseraccount-success": "Your account has been migrated. You can now [[Special:UserLogin|login]] with your username \"$1\" and your chosen password.",
 	"migrateuseraccount-failed": "There was a problem migrating your account. Please try again later.",
