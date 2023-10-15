@@ -37,22 +37,19 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 */
 	private $session;
 
-	/**
-	 * @var string
-	 */
 	private $localUsername;
 
 	private $remoteUsername;
 
 	/**
-	 * @var User
-	 */
-	private $user;
-
-	/**
 	 * @var LoggerInterface
 	 */
 	private $logger;
+
+	/**
+	 * @var UserNameUtils
+	 */
+	private $userNameUtils;
 
 	/**
 	 * @var string
@@ -80,6 +77,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 */
 	public function execute( $par ) {
 		$this->logger = LoggerFactory::getInstance( 'MigrateUserAccount' );
+		$this->userNameUtils = MediaWikiServices::getInstance()->getUserNameUtils();
 
 		$this->checkReadOnly();
 		$this->getOutput()->enableOOUI();
@@ -212,7 +210,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		}
 
 		if ( $isFallback ) {
-			$this->localUsername = $username;
+			$this->remoteUsername = $username;
 		}
 
 		return true;
@@ -234,7 +232,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$vals = $this->getRequest()->getValues();
 
 		$this->remoteUsername = $vals['wpusername'];
-		$this->user = MediaWikiServices::getInstance()->getUserFactory()->newFromName( $this->localUsername );
+		$this->localUsername = $this->userNameUtils->getCanonical( $this->localUsername );
 		$this->remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" . $this->remoteUsername .
 			"?action=edit";
 
@@ -263,6 +261,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			$password = $vals['wppassword'];
 			$confirmPassword = $vals['wpconfirmpassword'];
+			$newUsername = $vals['newusername'];
 
 			// Anything past this point assumes that we have the information we need to change their credentials
 
@@ -285,6 +284,23 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				);
 				$this->showFinalForm();
 				return true;
+			}
+
+			// For users with conflicting usernames, they'll have entered a new username at this point.
+			if ( $this->isUsingFallback() && !is_null( $newUsername ) ) {
+				$newUsername = $this->userNameUtils->getCanonical( $newUsername, $this->userNameUtils::RIGOR_CREATABLE );
+
+				if ( $newUsername === false ) {
+					$this->getOutput()->addHTML(
+						\Html::errorBox(
+							$this->msg( 'migrateuseraccount-invalid-username' )->text()
+						)
+					);
+					$this->showFinalForm();
+					return true;
+				} else {
+					// TODO: perform the rename
+				}
 			}
 
 			// Change user's credentials
