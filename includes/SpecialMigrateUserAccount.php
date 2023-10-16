@@ -41,8 +41,14 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 */
 	private $session;
 
+	/**
+	 * @var string
+	 */
 	private $localUsername;
 
+	/**
+	 * @var string
+	 */
 	private $remoteUsername;
 
 	/**
@@ -149,7 +155,8 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$form = HTMLForm::factory( 'ooui', $desc, $this->getContext() );
 		$form
 			->setFormIdentifier( 'form1' )
-			->setSubmitCallback( static function () {} )
+			->setSubmitCallback( static function () {
+			} )
 			->show();
 	}
 
@@ -180,7 +187,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			$desc['newusername'] = [
 				'class' => 'HTMLTextField',
 				'label-message' => 'migrateuseraccount-form-newusername',
-				'help-message' => ['migrateuseraccount-form-newusername-help', $this->remoteUsername],
+				'help-message' => [ 'migrateuseraccount-form-newusername-help', $this->remoteUsername ],
 				'required' => true
 			];
 		}
@@ -318,10 +325,10 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			}
 
 			// For users with conflicting usernames, they'll have entered a new username at this point.
-			if ( $this->isUsingFallback() && !is_null( $newUsername ) ) {
+			if ( $this->isUsingFallback() && $newUsername !== null ) {
 				$newUser = $this->userFactory->newFromName( $newUsername, $this->userFactory::RIGOR_CREATABLE );
 
-				if ( is_null( $newUser ) || $newUser->isRegistered() ) {
+				if ( $newUser === null || $newUser->isRegistered() ) {
 					$this->getOutput()->addHTML(
 						\Html::errorBox(
 							$this->msg( 'migrateuseraccount-invalid-username' )->text()
