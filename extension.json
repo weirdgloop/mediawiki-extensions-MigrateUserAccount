@@ -78,6 +78,9 @@
 		},
 		"FallbackSuffix": {
 			"value": ""
+		},
+		"FallbackRenameActor": {
+			"value": "Weird Gloop"
 		}
 	},
 	"manifest_version": 2

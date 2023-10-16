@@ -21,8 +21,10 @@
 namespace MediaWiki\Extension\MigrateUserAccount;
 
 use ErrorPageError;
+use ExtensionRegistry;
 use HTMLForm;
 use LogPage;
+use MediaWiki\Extension\Renameuser\RenameuserSQL;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Session\Session;
@@ -59,11 +61,18 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	private $userFactory;
 
 	/**
+	 * @var ExtensionRegistry
+	 */
+	private $extensionRegistry;
+
+	/**
 	 * @var string
 	 */
 	private string $remoteUrl;
 
 	private string $fallbackSuffix;
+
+	private string $renameActor;
 
 	public function __construct() {
 		parent::__construct( 'MigrateUserAccount' );
@@ -84,6 +93,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 */
 	public function execute( $par ) {
 		$this->logger = LoggerFactory::getInstance( 'MigrateUserAccount' );
+		$this->extensionRegistry = ExtensionRegistry::getInstance();
 		$this->userNameUtils = MediaWikiServices::getInstance()->getUserNameUtils();
 		$this->userFactory = MediaWikiServices::getInstance()->getUserFactory();
 
@@ -93,6 +103,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$this->getOutput()->addModuleStyles( [ 'ext.migrateuseraccount.styles' ] );
 
 		$this->fallbackSuffix = $this->getConfig()->get( 'MUAFallbackSuffix' );
+		$this->renameActor = $this->getConfig()->get( 'MUAFallbackRenameActor' );
 
 		if ( version_compare( MW_VERSION, '1.38', '>=' ) ) {
 			$this->getOutput()->disableClientCache();
@@ -224,7 +235,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 */
 	public function generateToken(): string {
 		$secret = pack( 'H*', $this->getConfig()->get( 'MUATokenSecret' ) );
-		$token = hash_hmac( 'sha256', $this->remoteUsername . ':' . $this->session->getId(), $secret );
+		$token = hash_hmac( 'sha256', $this->localUsername . ':' . $this->session->getId(), $secret );
 		return base64_encode( pack( 'H*', substr( $token, 0, 16 ) ) );
 	}
 
@@ -319,7 +330,47 @@ class SpecialMigrateUserAccount extends SpecialPage {
 					$this->showFinalForm();
 					return true;
 				} else {
-					// TODO: perform the rename
+					// Check whether Renameuser is loaded, as we have a dependency on it for users that have
+					// a conflicting username.
+					if ( !$this->extensionRegistry->isLoaded( 'Renameuser' ) ) {
+						$this->logger->critical( 'Renameuser is not loaded. Cannot rename users with fallback names.' );
+
+						$this->getOutput()->addHTML(
+							\Html::errorBox(
+								$this->msg( 'migrateuseraccount-failed' )->text()
+							)
+						);
+						return true;
+					}
+
+					$rename = new RenameuserSQL(
+						$user->getName(),
+						$newUser->getName(),
+						$user->getId(),
+						User::newSystemUser( $this->renameActor, [ 'steal' => true ] )
+					);
+
+					// Perform the rename
+					$res = $rename->rename();
+					if ( !$res ) {
+						$this->logger->error( '.' );
+
+						$this->getOutput()->addHTML(
+							\Html::errorBox(
+								$this->msg(
+									$this->localUsername . ' could not be renamed to ' . $newUser->getName()
+								)->text()
+							)
+						);
+						return true;
+					} else {
+						// If the rename was successful, load an updated User object
+						$user = $this->userFactory->newFromName( $newUser->getName() );
+
+						$this->logger->info( $this->localUsername . ' has renamed their account to ' .
+							$user->getName()
+						);
+					}
 				}
 			}
 
@@ -343,14 +394,14 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				return true;
 			}
 
-			$this->logger->info( $this->localUsername . ' has migrated their account successfully from ' .
+			$this->logger->info( $user->getName() . ' has migrated their account successfully from ' .
 				$this->getConfig()->get( 'MUARemoteWikiAPI' )
 			);
 
 			// Password change was successful by this point :)
 			$this->getOutput()->addHTML(
 				\Html::successBox(
-					$this->msg( 'migrateuseraccount-success', $this->localUsername )
+					$this->msg( 'migrateuseraccount-success', $user->getName() )
 				)
 			);
 
