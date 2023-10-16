@@ -26,6 +26,7 @@ use LogPage;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Session\Session;
+use MediaWiki\User\UserFactory;
 use MediaWiki\User\UserNameUtils;
 use Psr\Log\LoggerInterface;
 use SpecialPage;
@@ -51,6 +52,11 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 * @var UserNameUtils
 	 */
 	private $userNameUtils;
+
+	/**
+	 * @var UserFactory
+	 */
+	private $userFactory;
 
 	/**
 	 * @var string
@@ -79,6 +85,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	public function execute( $par ) {
 		$this->logger = LoggerFactory::getInstance( 'MigrateUserAccount' );
 		$this->userNameUtils = MediaWikiServices::getInstance()->getUserNameUtils();
+		$this->userFactory = MediaWikiServices::getInstance()->getUserFactory();
 
 		$this->checkReadOnly();
 		$this->getOutput()->enableOOUI();
@@ -162,7 +169,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			$desc['newusername'] = [
 				'class' => 'HTMLTextField',
 				'label-message' => 'migrateuseraccount-form-newusername',
-				'help-message' => 'migrateuseraccount-form-newusername-help',
+				'help-message' => ['migrateuseraccount-form-newusername-help', $this->remoteUsername],
 				'required' => true
 			];
 		}
@@ -267,7 +274,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			$password = $vals['wppassword'];
 			$confirmPassword = $vals['wpconfirmpassword'];
-			$newUsername = $vals['newusername'];
+			$newUsername = $vals['wpnewusername'];
 
 			// Anything past this point assumes that we have the information we need to change their credentials
 
@@ -282,7 +289,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				return true;
 			}
 
-			$user = MediaWikiServices::getInstance()->getUserFactory()->newFromName( $this->localUsername );
+			$user = $this->userFactory->newFromName( $this->localUsername );
 
 			if ( !$user->isRegistered() ) {
 				// This should never happen, but if we somehow reach this, abort with an error.
@@ -301,9 +308,9 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			// For users with conflicting usernames, they'll have entered a new username at this point.
 			if ( $this->isUsingFallback() && !is_null( $newUsername ) ) {
-				$newUsername = $this->userNameUtils->getCanonical( $newUsername, $this->userNameUtils::RIGOR_CREATABLE );
+				$newUser = $this->userFactory->newFromName( $newUsername, $this->userFactory::RIGOR_CREATABLE );
 
-				if ( $newUsername === false ) {
+				if ( is_null( $newUser ) || $newUser->isRegistered() ) {
 					$this->getOutput()->addHTML(
 						\Html::errorBox(
 							$this->msg( 'migrateuseraccount-invalid-username' )->text()

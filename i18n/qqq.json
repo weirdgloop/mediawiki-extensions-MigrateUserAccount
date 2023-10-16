@@ -25,5 +25,6 @@
 	"migrateuseraccount-success": "The message displayed when the account migration is successful.\nParameters:\n* $1 - Username",
 	"migrateuseraccount-failed": "The generic error message displayed if the account migration was not successful.",
 	"migrateuseraccount-invalid-password": "The error message displayed if the new password does not meet the wiki's requirements.",
-	"migrateuseraccount-wrong-confirm-password": "The error message displayed if the entered new password and confirmation of new password do not match."
+	"migrateuseraccount-wrong-confirm-password": "The error message displayed if the entered new password and confirmation of new password do not match.",
+	"migrateuseraccount-invalid-username": "The error message displayed if the new username entered is invalid or is in use."
 }

@@ -27,5 +27,6 @@
 	"migrateuseraccount-success": "Your account has been migrated. You can now [[Special:UserLogin|login]] with your username \"$1\" and your chosen password.",
 	"migrateuseraccount-failed": "There was a problem migrating your account. Please try again later.",
 	"migrateuseraccount-invalid-password": "The password you provided is not valid. Please ensure that it meets the requirements for this wiki.",
-	"migrateuseraccount-wrong-confirm-password": "The passwords you entered do not match."
+	"migrateuseraccount-wrong-confirm-password": "The passwords you entered do not match.",
+	"migrateuseraccount-invalid-username": "The new username you entered is invalid or is in use."
 }
