@@ -26,6 +26,7 @@ use LogPage;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Session\Session;
+use MediaWiki\User\UserNameUtils;
 use Psr\Log\LoggerInterface;
 use SpecialPage;
 use User;
@@ -84,7 +85,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$this->getOutput()->addModules( 'special.migrateuseraccount' );
 		$this->getOutput()->addModuleStyles( [ 'ext.migrateuseraccount.styles' ] );
 
-		$this->fallbackSuffix = $this->getConfig()->get( 'FallbackSuffix' );
+		$this->fallbackSuffix = $this->getConfig()->get( 'MUAFallbackSuffix' );
 
 		if ( version_compare( MW_VERSION, '1.38', '>=' ) ) {
 			$this->getOutput()->disableClientCache();
@@ -178,20 +179,19 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 * @return bool
 	 */
 	public function checkUserCanMigrate(): bool {
-		$username = $this->localUsername;
 		$isFallback = false;
 
 		while ( true ) {
 			// Ensure that the user is a stub (has no password set) before continuing
 			$dbr = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_REPLICA );
-			$row = $dbr->selectRow( 'user', [ 'user_id', 'user_password' ], [ 'user_name' => $username ],
+			$row = $dbr->selectRow( 'user', [ 'user_id', 'user_password' ], [ 'user_name' => $this->localUsername ],
 				__METHOD__ );
 
 			if ( !$row || $row->user_password != '' ) {
 				// User is not a stub
 				if ( !empty( $this->fallbackSuffix && !$isFallback ) ) {
 					// If a fallback suffix is set, try again but with that suffix
-					$username = $username . $this->fallbackSuffix;
+					$this->localUsername = $this->localUsername . $this->fallbackSuffix;
 					$isFallback = true;
 					continue;
 				}
@@ -207,10 +207,6 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			}
 
 			break;
-		}
-
-		if ( $isFallback ) {
-			$this->remoteUsername = $username;
 		}
 
 		return true;
@@ -231,21 +227,31 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	public function showTokenDetails() {
 		$vals = $this->getRequest()->getValues();
 
-		$this->remoteUsername = $vals['wpusername'];
-		$this->localUsername = $this->userNameUtils->getCanonical( $this->localUsername );
-		$this->remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" . $this->remoteUsername .
-			"?action=edit";
+		// These two are set to the same for now, but may change later if we fallback.
+		$this->localUsername = $this->userNameUtils->getCanonical( $vals['wpusername'] );
+		$this->remoteUsername = $this->localUsername;
 
+		// Check whether the user can migrate. This does a few things:
+		// - Does the user already exist?
+		// - If the user does exist, and we have a fallback suffix defined, does a fallback user exist?
 		$canMigrate = $this->checkUserCanMigrate();
 		if ( !$canMigrate ) {
 			// User cannot migrate, jump out
 			return false;
 		}
 
+		// At this point, $this->localUsername may have changed, if we've defined a fallback username.
+		// For other non-Weird Gloop users of this extension, a fallback username will not be used here.
+		// In future, we can check $this->isUsingFallback() to determine whether we're using a fallback username.
+
+		// Set the URL for the user to edit their User page on the remote wiki
+		$this->remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" . $this->remoteUsername .
+			"?action=edit";
+
 		// Generate a token
 		$token = $this->generateToken();
 
-		$this->logger->debug( $this->user->getName() . ' generated a new migration token for ' .
+		$this->logger->debug( $this->localUsername . ' generated a new migration token for ' .
 			$this->getConfig()->get( 'MUARemoteWikiAPI' )
 		);
 
@@ -276,7 +282,14 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				return true;
 			}
 
-			if ( !$this->user->isValidPassword( $password ) ) {
+			$user = MediaWikiServices::getInstance()->getUserFactory()->newFromName( $this->localUsername );
+
+			if ( !$user->isRegistered() ) {
+				// This should never happen, but if we somehow reach this, abort with an error.
+				$this->logger->error( $this->localUsername . ' is not registered, so we aborted the migration.' );
+			}
+
+			if ( !$user->isValidPassword( $password ) ) {
 				$this->getOutput()->addHTML(
 					\Html::errorBox(
 						$this->msg( 'migrateuseraccount-invalid-password' )->text()
@@ -304,14 +317,14 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			}
 
 			// Change user's credentials
-			$status = $this->user->changeAuthenticationData( [
+			$status = $user->changeAuthenticationData( [
 				'password' => $password,
 				'retype' => $password
 			] );
 
 			if ( !$status->isGood() ) {
-				$this->logger->error( $this->user->getName() . ' failed to migrate their account from ' .
-					$this->getConfig()->get( 'MUARemoteWikiAPI' ) . ': ' . $status->getMessage()->text()
+				$this->logger->error( $this->localUsername . ' failed to change auth data: ' .
+					$status->getMessage()->text()
 				);
 
 				$this->getOutput()->addHTML(
@@ -323,22 +336,20 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				return true;
 			}
 
-			$this->logger->info( $this->user->getName() . ' has migrated their account successfully from ' .
+			$this->logger->info( $this->localUsername . ' has migrated their account successfully from ' .
 				$this->getConfig()->get( 'MUARemoteWikiAPI' )
 			);
-
-			// TODO if remote un is different to local un, we must have fallen back at some point, so rename them(?)
 
 			// Password change was successful by this point :)
 			$this->getOutput()->addHTML(
 				\Html::successBox(
-					$this->msg( 'migrateuseraccount-success', $this->user->getName() )
+					$this->msg( 'migrateuseraccount-success', $this->localUsername )
 				)
 			);
 
 			// Save to the on-wiki log, if enabled
 			if ( $this->getConfig()->get( 'MUALogToWiki' ) ) {
-				$this->saveToLog( $this->user );
+				$this->saveToLog( $user );
 			}
 
 			return true;
@@ -379,7 +390,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	 * @return bool|string
 	 */
 	private function verifyToken( string $token ) {
-		$un = rawurlencode( $this->user->getName() );
+		$un = rawurlencode( $this->remoteUsername );
 		$textToTest = '';
 
 		$url = $this->getConfig()->get( 'MUARemoteWikiAPI' ) .
