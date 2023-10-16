@@ -199,7 +199,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				// If a fallback suffix is not set, or we tried with the fallback suffix and no dice, show an error
 				$this->getOutput()->addHTML(
 					\Html::errorBox(
-						$this->msg( 'migrateuseraccount-error-user-' . ( !$row ? 'nonexistent' : 'migrated' ) )->text()
+						$this->msg( 'migrateuseraccount-error-user-invalid' )->text()
 					)
 				);
 				$this->showForm();
