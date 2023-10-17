@@ -1,0 +1,30 @@
+{
+  "@metadata": {
+    "authors": ["Dianliang233"]
+  },
+  "migrateuseraccount": "迁移用户账号",
+  "migrateuseraccount-desc": "允许用户通过在远程wiki上验证身份来认领账号。",
+  "migrateuseraccount-loginprompt": "若您需要将您的旧账号迁移至本wiki，请按照[[Special:迁移用户账号]]上的步骤操作。",
+  "migrateuseraccount-error-loggedin": "您已经登录。若您需要迁移另一个账号，请先退出。",
+  "migrateuseraccount-error-user-invalid": "您输入的用户不存在或已经完成迁移了。",
+  "migrateuseraccount-help": "本页面可以让您通过在旧wiki上验证身份来迁移账号。''这只需要一分钟'''，而且您可以认领您的编辑历史和贡献。",
+  "migrateuseraccount-form-password-help": "这是您在本wiki上想要使用的密码。",
+  "migrateuseraccount-token-title": "$1的密钥为：$2",
+  "migrateuseraccount-token-help": "请'''在登录状态下'''编辑您在旧wiki上的用户页，并把这串密钥粘贴在页面内容或编辑摘要中。您可以在此处编辑您在旧wiki的用户页：$1",
+  "migrateuseraccount-token-button": "我已经添加了密钥",
+  "migrateuseraccount-token-no-token": "我们找不到密钥。请确保密钥在页面内容或$1的最近一次编辑摘要中。",
+  "migrateuseraccount-token-no-recent-edit": "在过去10分钟内$1没有任何编辑。请确保您编辑了正确的页面。",
+  "migrateuseraccount-token-username-no-match": "$1的最后一次编辑不来自您的账号。请确保您登录了正确的账号。",
+  "migrateuseraccount-form-password": "新密码",
+  "migrateuseraccount-form-confirm-password": "确认新密码",
+  "migrateuseraccount-form-username": "用户名",
+  "migrateuseraccount-form-username-help": "这是您想要从旧wiki上迁移的账号。",
+  "migrateuseraccount-form-newusername": "新用户名",
+  "migrateuseraccount-form-newusername-help": "用户名为'''$1'''的用户已存在。请再输入一个您在本wiki上想要使用的用户名。",
+  "migrateuseraccount-migrated-log-entry": "迁移了账号",
+  "migrateuseraccount-success": "您的账号已被迁移。您现在可以用您的用户名“$1”和您选定的密码来[[Special:UserLogin|登录]]。",
+  "migrateuseraccount-failed": "迁移您的账号时发生了错误，请稍后再试。",
+  "migrateuseraccount-invalid-password": "您提供的密码无效。请确保密码符合本wiki的需求。",
+  "migrateuseraccount-wrong-confirm-password": "您输入的密码不匹配。",
+  "migrateuseraccount-invalid-username": "您输入的用户名无效或者已经被占用。"
+}
