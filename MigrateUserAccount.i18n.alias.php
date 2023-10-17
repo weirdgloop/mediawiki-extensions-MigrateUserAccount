@@ -9,3 +9,7 @@ $specialPageAliases['en'] = [
 $specialPageAliases['zh-hans'] = [
 	'MigrateUserAccount' => [ '迁移用户账号' ],
 ];
+
+$specialPageAliases['uk'] = [
+	'MigrateUserAccount' => [ 'Перенестисвійакаунт' ],
+];
