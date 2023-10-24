@@ -1,0 +1,32 @@
+{
+	"@metadata": {
+		"authors": [
+			"TH Minecraft Wiki editors"
+		]
+	},
+	"migrateuseraccount": "โยกย้ายบัญชีผู้ใช้",
+	"migrateuseraccount-desc": "อนุญาตให้ผู้ใช้เรียกคืนบัญชีของตัวเองบนวิกิด้วยการยืนยันตัวตนบนวิกิภายนอก",
+	"migrateuseraccount-loginprompt": "หากคุณต้องการโยกย้ายบัญชีเก่ามายังวิกิแห่งนี้ โปรดปฏิบัติตามขั้นตอนที่ [[{{#special:MigrateUserAccount}}]]",
+	"migrateuseraccount-error-loggedin": "คุณอยู่ในระบบอยู่แล้ว หากคุณต้องการโยกย้ายบัญชีอื่น คุณต้องออกจากระบบก่อน",
+	"migrateuseraccount-error-user-invalid": "ผู้ใช้ที่คุณป้อนไม่มีอยู่หรือถูกโยกย้ายไปแล้ว",
+	"migrateuseraccount-help": "หน้านี้จะทำให้คุณโยกย้ายบัญชีเก่าของคุณมายังวิกิแห่งนี้ด้วยการยืนยันตัวตนบนวิกิเก่า '''ขั้นตอนนี้จะใช้เวลาเพียงไม่กี่นาทีเท่านั้น''' และจะช่วยให้คุณสามารถเรียกคืนประวัติการแก้ไขและการมีส่วนร่วมของคุณได้",
+	"migrateuseraccount-form-password-help": "นี่คือรหัสผ่านที่คุณต้องการจะใช้บนวิกิแห่งนี้",
+	"migrateuseraccount-token-title": "โทเค็นของ $1 คือ: $2",
+	"migrateuseraccount-token-help": "โปรดแก้ไขหน้าผู้ใช้ของคุณบนวิกิเก่า'''ในขณะที่ลงชื่อเข้าใช้''' และวางโทเค็นนี้ลงในเนื้อหาหรือความย่อการแก้ไข คุณสามารถแก้ไขหน้าผู้ใช้ของคุณบนวิกิเก่าได้ที่นี่: $1",
+	"migrateuseraccount-token-button": "ฉันเพิ่มโทเค็นแล้ว",
+	"migrateuseraccount-token-no-token": "เราหาโทเค็นไม่พบ โปรดตรวจสอบให้แน่ใจว่าโทเค็นนั้นอยู่ในเนื้อหาหรือความย่อการแก้ไขของการแก้ไขครั้งล่าสุดบน $1",
+	"migrateuseraccount-token-no-recent-edit": "ไม่มีการแก้ไขใด ๆ บน $1 ใน 10 นาทีที่ผ่านมา โปรดตรวจสอบให้แน่ใจว่าคุณกำลังแก้ไขในหน้าที่ถูกต้อง",
+	"migrateuseraccount-token-username-no-match": "การแก้ไขครั้งล่าสุดบน $1 เกิดจากบัญชีที่ไม่ถูกต้อง โปรดตรวจสอบให้แน่ใจว่าคุณกำลังเข้าสู่ระบบในบัญชีที่ถูกต้อง",
+	"migrateuseraccount-form-password": "รหัสผ่านใหม่",
+	"migrateuseraccount-form-confirm-password": "ยืนยันรหัสผ่าน",
+	"migrateuseraccount-form-username": "ชื่อผู้ใช้",
+	"migrateuseraccount-form-username-help": "นี่คือบัญชีที่คุณต้องการโยกย้ายจากวิกิเก่า",
+	"migrateuseraccount-form-newusername": "ชื่อผู้ใช้ใหม่",
+	"migrateuseraccount-form-newusername-help": "ผู้ใช้ที่ใช้ชื่อว่า '''$1''' มีอยู่แล้ว โปรดกรอกชื่อผู้ใช้ใหม่ที่คุณต้องการใช้บนวิกิแห่งนี้",
+	"migrateuseraccount-migrated-log-entry": "โยกย้ายบัญชีแล้ว",
+	"migrateuseraccount-success": "บัญชีของคุณถูกโยกย้ายแล้ว ตอนนี้คุณสามารถ[[{{#special:UserLogin}}|เข้าสู่ระบบ]]ด้วยชื่อผู้ใช้ \"$1\" และรหัสผ่านที่คุณตั้งไว้",
+	"migrateuseraccount-failed": "มีปัญหาในการโยกย้ายบัญชีของคุณ โปรดลองอีกครั้งในภายหลัง",
+	"migrateuseraccount-invalid-password": "รหัสผ่านที่คุณกรอกไม่ถูกต้อง โปรดตรวจสอบให้แน่ใจว่ารหัสผ่านตรงกับข้อกำหนดของวิกิแห่งนี้",
+	"migrateuseraccount-wrong-confirm-password": "รหัสผ่านที่คุณกรอกไม่ตรงกัน",
+	"migrateuseraccount-invalid-username": "ชื่อผู้ใช้ใหม่ที่คุณกรอกไม่ถูกต้องหรือมีคนใช้ไปแล้ว"
+}

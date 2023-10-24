@@ -1,0 +1,32 @@
+{
+	"@metadata": {
+		"authors": [
+			"ES Minecraft Wiki editors"
+		]
+	},
+	"migrateuseraccount": "Migrar cuenta de usuario",
+	"migrateuseraccount-desc": "Permite que los usuarios recuperen su cuenta en una wiki verificando su identidad en una wiki externa.",
+	"migrateuseraccount-loginprompt": "Si necesitas migrar tu cuenta anterior a esta wiki, por favor sigue los pasos en [[{{#special:MigrateUserAccount}}]].",
+	"migrateuseraccount-error-loggedin": "Ya has iniciado sesión. Si necesitas migrar una cuenta diferente, deberías cerrar sesión antes.",
+	"migrateuseraccount-error-user-invalid": "El usuario que has ingresado o no existe o ya ha sido migrado.",
+	"migrateuseraccount-help": "Esta página te permite migrar tu cuenta anterior a esta wiki, al verificar tu identidad en la wiki antigua. '''Esto solo durará un minuto''' y te permitirá recuperar tu historial de ediciones y contribuciones.",
+	"migrateuseraccount-form-password-help": "Esta es la contraseña que te gustaría utilizar en esta wiki.",
+	"migrateuseraccount-token-title": "La clave de $1 es: $2",
+	"migrateuseraccount-token-help": "Por favor edita tu página de usuario en la wiki antigua '''con la sesión iniciada''', y pega esta clave en el contenido o en el resumen de edición. Puedes editar tu página de usuario en la wiki antigua aquí: $1",
+	"migrateuseraccount-token-button": "He añadido la clave",
+	"migrateuseraccount-token-no-token": "No pudimos encontrar la clave. Por favor verifica que se encuentre en el contenido o en el resumen de edición de la edición más reciente en $1.",
+	"migrateuseraccount-token-no-recent-edit": "No se han realizado ediciones en $1 en los últimos 10 minutos. Por favor verifica de que estás editando en la página correcta.",
+	"migrateuseraccount-token-username-no-match": "La última edición a $1 fue realizada por una cuenta incorrecta. Por favor verifica que has iniciado sesión con la cuenta correcta.",
+	"migrateuseraccount-form-password": "Nueva contraseña",
+	"migrateuseraccount-form-confirm-password": "Confirmar nueva contraseña",
+	"migrateuseraccount-form-username": "Nombre de usuario",
+	"migrateuseraccount-form-username-help": "Esta es la cuenta que quieres migrar desde la wiki antigua.",
+	"migrateuseraccount-form-newusername": "Nuevo nombre de usuario",
+	"migrateuseraccount-form-newusername-help": "Ya existe un usuario con el nombre '''$1'''. Por favor ingresa un nombre diferente que quisieras usar en esta wiki.",
+	"migrateuseraccount-migrated-log-entry": "migró su cuenta",
+	"migrateuseraccount-success": "Tu cuenta ha sido migrada. Ahora puedes [[{{#special:UserLogin}}|iniciar sesión]] con tu nombre ''S1'' y tu contraseña elegida.",
+	"migrateuseraccount-failed": "Hubo un problema al migrar tu cuenta. Por favor inténtalo más tarde.",
+	"migrateuseraccount-invalid-password": "La contraseña que has ingresado no es válida. Por favor verifica que cumple con los requisitos para esta wiki.",
+	"migrateuseraccount-wrong-confirm-password": "Las contraseñas que has ingresado no coinciden.",
+	"migrateuseraccount-invalid-username": "El nuevo nombre de usuario que has ingresado o no es válido o ya está en uso."
+}

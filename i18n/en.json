@@ -1,12 +1,12 @@
 {
 	"@metadata": {
 		"authors": [
-		  "Jayden Bailey"
+			"Jayden Bailey"
 		]
 	},
-  	"migrateuseraccount": "Migrate user account",
-  	"migrateuseraccount-desc": "Allows users to reclaim their account on a wiki by verifying their identity on an external wiki.",
-  	"migrateuseraccount-loginprompt": "If you need to migrate your old account to this wiki, please follow the steps at [[Special:MigrateUserAccount]].",
+	"migrateuseraccount": "Migrate user account",
+	"migrateuseraccount-desc": "Allows users to reclaim their account on a wiki by verifying their identity on an external wiki.",
+	"migrateuseraccount-loginprompt": "If you need to migrate your old account to this wiki, please follow the steps at [[Special:MigrateUserAccount]].",
 	"migrateuseraccount-error-loggedin": "You are already logged in. If you need to migrate a different account, you should log out first.",
 	"migrateuseraccount-error-user-invalid": "The user you entered does not exist or is already migrated.",
 	"migrateuseraccount-help": "This page allows you to migrate your old account to this wiki, by verifying your identity on the old wiki. '''This will only take a minute''' and will allow you to reclaim your edit history and contributions.",

@@ -1,0 +1,32 @@
+{
+	"@metadata": {
+		"authors": [
+			"DE Minecraft Wiki editors"
+		]
+	},
+	"migrateuseraccount": "Benutzerkonto migrieren",
+	"migrateuseraccount-desc": "Erlaubt es Benutzern, ihr Konto auf dem Wiki zurückzufordern, indem ihre Identität auf einem externen Wiki verifiziert wird.",
+	"migrateuseraccount-loginprompt": "Falls du dein altes Benutzerkonto auf dieses Wiki migrieren möchtest, folge den Anweisungen auf [[{{#special:MigrateUserAccount}}]].",
+	"migrateuseraccount-error-loggedin": "Du bist bereits angemeldet. Falls du ein anderes Benutzerkonto migrieren möchtest, melde dich zuerst ab.",
+	"migrateuseraccount-error-user-invalid": "Der eingegebene Benutzername existiert nicht oder wurde bereits migriert.",
+	"migrateuseraccount-help": "Diese Seite erlaubt es dir, dein altes Benutzerkonto auf dieses Wiki zu migrieren, indem deine Identität auf dem alten Wiki verifiziert wird. '''Das dauert nur eine Minute''' und wird es dir erlauben, deine Bearbeitungshistorie und Beiträge zurückzufordern.",
+	"migrateuseraccount-form-password-help": "Das Passwort, das du auf diesem Wiki benutzen möchtest.",
+	"migrateuseraccount-token-title": "Der Code von $1 ist: $2",
+	"migrateuseraccount-token-help": "Bitte bearbeite deine Benutzerseite auf dem vorherigen Wiki, '''während du angemeldet bist''', und füge diesen Code in den Seiteninhalt oder die Zusammenfassung ein. Du kannst deine Benutzerseite auf dem vorherigen Wiki hier bearbeiten: $1",
+	"migrateuseraccount-token-button": "Ich habe den Code hinzugefügt",
+	"migrateuseraccount-token-no-token": "Wir konnten den Code nicht finden. Bitte stelle sicher, dass er sich entweder im Inhalt oder in der Zusammenfassung der letzten Bearbeitung von $1 befindet.",
+	"migrateuseraccount-token-no-recent-edit": "Die Seite $1 wurde in den letzten zehn Minuten nicht bearbeitet. Bitte stelle sicher, dass du die richtige Seite bearbeitest.",
+	"migrateuseraccount-token-username-no-match": "Die letzte Bearbeitung auf $1 wurde von einem anderen Benutzer durchgeführt. Bitte stelle sicher, dass du mit dem richtigen Benutzerkonto angemeldet bist.",
+	"migrateuseraccount-form-password": "Neues Passwort",
+	"migrateuseraccount-form-confirm-password": "Neues Passwort bestätigen",
+	"migrateuseraccount-form-username": "Benutzername",
+	"migrateuseraccount-form-username-help": "Dies ist das Benutzerkonto, das du von dem alten Wiki migrieren möchtest.",
+	"migrateuseraccount-form-newusername": "Neuer Benutzername",
+	"migrateuseraccount-form-newusername-help": "Ein Benutzer mit dem Namen '''$1''' existiert bereits. Bitte gib einen anderen Benutzernamen ein, den du auf diesem Wiki benutzen möchtest.",
+	"migrateuseraccount-migrated-log-entry": "wurde migriert",
+	"migrateuseraccount-success": "Dein Benutzerkonto wurde erfolgreich migriert. Du kannst dich jetzt mit deinem Benutzernamen „$1“ und deinem ausgewählten Passwort [[{{#special:UserLogin}}|anmelden]].",
+	"migrateuseraccount-failed": "Es gab ein Problem während der Migration deines Benutzerkontos. Bitte versuche es später noch einmal.",
+	"migrateuseraccount-invalid-password": "Das angegebene Passwort ist ungültig. Bitte stelle sicher, dass es den Anforderungen dieses Wikis entspricht.",
+	"migrateuseraccount-wrong-confirm-password": "Die angegebenen Passwörter stimmen nicht überein.",
+	"migrateuseraccount-invalid-username": "Der eingegebene neue Benutzername ist ungültig oder wird von jemand anderem benutzt."
+}

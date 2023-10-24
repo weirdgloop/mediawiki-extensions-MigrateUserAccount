@@ -1,0 +1,32 @@
+{
+	"@metadata": {
+		"authors": [
+			"NL Minecraft Wiki editors"
+		]
+	},
+	"migrateuseraccount": "Gebruikersaccount migreren",
+	"migrateuseraccount-desc": "Staat toe dat gebruikers hun account kunnen claimen op een wiki door hun identiteit te verifiëren op een externe wiki.",
+	"migrateuseraccount-loginprompt": "Volg de stappen op [[{{#special:MigrateUserAccount}}]] als u uw oude account wilt migreren naar deze wiki.",
+	"migrateuseraccount-error-loggedin": "U bent al aangemeld. Als u een ander account wilt migreren, moet u zich eerst afmelden.",
+	"migrateuseraccount-error-user-invalid": "De ingevoerde gebruiker bestaat niet of is al gemigreerd.",
+	"migrateuseraccount-help": "Op deze pagina kunt u uw oude account naar deze wiki migreren door uw identiteit te verifiëren op de oude wiki. '''Dit duurt slechts een paar minuten''' en tijdens dit proces kunt u uw bewerkingsgeschiedenis en bijdragen opnieuw claimen.",
+	"migrateuseraccount-form-password-help": "Dit is het wachtwoord dat u op deze wiki wilt gebruiken.",
+	"migrateuseraccount-token-title": "Het token van $1 is $2",
+	"migrateuseraccount-token-help": "Bewerk uw gebruikerspagina op de oude wiki '''terwijl u aangemeld bent'''. Plaats dit token in de inhoud of in de bewerkingssamenvatting. U kunt uw gebruikerspagina op de oude wiki via $1 bewerken.",
+	"migrateuseraccount-token-button": "Ik heb het token toegevoegd",
+	"migrateuseraccount-token-no-token": "We konden het token niet vinden. Zorg ervoor dat het zich in de inhoud of bewerkingssamenvatting bevindt van de recentste bewerking op $1.",
+	"migrateuseraccount-token-no-recent-edit": "In de laatste tien minuten zijn geen bewerkingen gedaan op $1. Zorg ervoor dat u de juiste pagina bewerkt.",
+	"migrateuseraccount-token-username-no-match": "De recentste bewerking op $1 werd gemaakt met het verkeerde account. Zorg ervoor dat u zich aangemeld hebt met het juiste account.",
+	"migrateuseraccount-form-password": "Nieuw wachtwoord",
+	"migrateuseraccount-form-confirm-password": "Wachtwoord bevestigen",
+	"migrateuseraccount-form-username": "Gebruikersnaam",
+	"migrateuseraccount-form-username-help": "Dit is het account van de oude wiki dat u wilt migeren.",
+	"migrateuseraccount-form-newusername": "Nieuwe gebruikersnaam",
+	"migrateuseraccount-form-newusername-help": "Een gebruiker met de gebruikersnaam '''$1''' bestaat al. Voer een andere gebruikersnaam in die u wilt gebruiken op deze wiki.",
+	"migrateuseraccount-migrated-log-entry": "heeft hun account gemigreerd",
+	"migrateuseraccount-success": "Uw account werd gemigreerd. U kunt zich nu [[{{#special:UserLogin}}|aanmelden]] met de gebruikersnaam ''$1'' en het gekozen wachtwoord.",
+	"migrateuseraccount-failed": "Er trad een probleem op tijdens het migreren van uw account. Probeer het later opnieuw.",
+	"migrateuseraccount-invalid-password": "Het ingevoerde wachtwoord is ongeldig. Zorg ervoor dat het voldoet aan de vereisten van deze wiki.",
+	"migrateuseraccount-wrong-confirm-password": "De ingevoerde wachtwoorden komen niet overeen.",
+	"migrateuseraccount-invalid-username": "De ingevoerde nieuwe gebruikersnaam is ongeldig of al in gebruik."
+}

@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"Toktom"
+			"Toktom",
+			"PT-BR Minecraft Wiki editors"
 		]
 	},
 	"migrateuseraccount": "Migrar conta de usuário",
@@ -21,9 +22,12 @@
 	"migrateuseraccount-form-confirm-password": "Confirmar a nova senha",
 	"migrateuseraccount-form-username": "Nome de usuário",
 	"migrateuseraccount-form-username-help": "Esta é a conta que você gostaria de migrar da wiki antiga.",
+	"migrateuseraccount-form-newusername": "Novo nome de usuário",
+	"migrateuseraccount-form-newusername-help": "Um usuário com esse nome de usuário '''$1''' já existe. Por favo digite um nome de usuário diferente que você gostaria de usar na wiki.",
 	"migrateuseraccount-migrated-log-entry": "migrou a sua conta",
 	"migrateuseraccount-success": "Sua conta foi migrada com sucesso. Agora você pode acessar sua [[Special:UserLogin|conta]] com seu nome de usuário \"$1\" e com a sua nova senha.",
 	"migrateuseraccount-failed": "Houve um problema ao migrar sua conta. Por favor, tente novamente mais tarde.",
 	"migrateuseraccount-invalid-password": "A senha que você forneceu é inválida. Verifique se ela atende aos requisitos para este wiki.",
-	"migrateuseraccount-wrong-confirm-password": "As senhas que você digitou não são correspondentes."
+	"migrateuseraccount-wrong-confirm-password": "As senhas que você digitou não coincidem.",
+	"migrateuseraccount-invalid-username": "O novo nome de usuário que você digitou é invalido ou já está em uso."
 }
