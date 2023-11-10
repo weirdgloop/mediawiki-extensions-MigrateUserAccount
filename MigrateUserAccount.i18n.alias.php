@@ -19,7 +19,7 @@ $specialPageAliases['uk'] = [
 ];
 
 $specialPageAliases['de'] = [
-	'MigrateUserAccount' => [ 'Benutzerkontomigrieren' ]
+	'MigrateUserAccount' => [ 'Benutzerkonto_migrieren' ]
 ];
 
 $specialPageAliases['fr'] = [
