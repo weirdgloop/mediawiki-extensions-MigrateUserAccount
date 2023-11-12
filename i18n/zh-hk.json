@@ -1,0 +1,18 @@
+{
+	"@metadata": {
+		"authors": [
+			"Lakejason0"
+		]
+	},
+	"migrateuseraccount": "遷移用戶帳號",
+	"migrateuseraccount-desc": "允許用戶透過在遠端wiki上驗證身份來認領帳號。",
+	"migrateuseraccount-loginprompt": "若您需要將您的舊帳號遷移至本wiki，請按照[[Special:遷移用戶帳號]]上的步驟操作。",
+	"migrateuseraccount-error-user-invalid": "您輸入的用戶名不存在或是已經完成遷移了。",
+	"migrateuseraccount-token-help": "請'''在登入狀態下'''編輯您在舊wiki上的用戶頁，並把這串權杖貼到頁面內容或編輯摘要中。您可以在此處編輯您在舊wiki的用戶頁：$1",
+	"migrateuseraccount-form-username": "用戶名",
+	"migrateuseraccount-form-username-help": "這是您想要從舊wiki上遷移的帳號。",
+	"migrateuseraccount-form-newusername": "新用戶名",
+	"migrateuseraccount-form-newusername-help": "用戶名為'''$1'''的用戶已存在。請再輸入一個您在本wiki上想要使用的用戶名。",
+	"migrateuseraccount-success": "您的帳號已被遷移。您現在可以用您的用戶名「$1」和您選定的密碼來[[Special:UserLogin|登入]]。",
+	"migrateuseraccount-invalid-username": "您輸入的用戶名無效或是已經被佔用。"
+}

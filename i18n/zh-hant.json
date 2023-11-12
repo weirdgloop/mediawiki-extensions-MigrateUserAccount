@@ -1,0 +1,32 @@
+{
+	"@metadata": {
+		"authors": [
+			"Lakejason0"
+		]
+	},
+	"migrateuseraccount": "遷移使用者帳號",
+	"migrateuseraccount-desc": "允許使用者透過在遠端wiki上驗證身份來認領帳號。",
+	"migrateuseraccount-loginprompt": "若您需要將您的舊帳號遷移至本wiki，請按照[[Special:遷移使用者帳號]]上的步驟操作。",
+	"migrateuseraccount-error-loggedin": "您已登入。若您需要遷移另一個帳號，請先登出。",
+	"migrateuseraccount-error-user-invalid": "您輸入的使用者名稱不存在或是已經完成遷移了。",
+	"migrateuseraccount-help": "本頁面可以讓您透過在舊wiki上驗證身份來遷移帳號。'''這只需要一分鐘'''，而且您可以認領您的編輯歷史和貢獻。",
+	"migrateuseraccount-form-password-help": "這是您在本wiki上想要使用的密碼。",
+	"migrateuseraccount-token-title": "$1的權杖為：$2",
+	"migrateuseraccount-token-help": "請'''在登入狀態下'''編輯您在舊wiki上的使用者頁面，並把這串權杖貼到頁面內容或編輯摘要中。您可以在此處編輯您在舊wiki的使用者頁面：$1",
+	"migrateuseraccount-token-button": "我已經加入了權杖",
+	"migrateuseraccount-token-no-token": "我們找不到權杖。請確保權杖在頁面內容或$1的最近一次編輯摘要中。",
+	"migrateuseraccount-token-no-recent-edit": "在過去10分鐘內$1沒有任何編輯。請確保您編輯了正確的頁面。",
+	"migrateuseraccount-token-username-no-match": "$1的最後一次編輯並非來自您的帳號。請確保您登入了正確的帳號。",
+	"migrateuseraccount-form-password": "新密碼",
+	"migrateuseraccount-form-confirm-password": "確認新密碼",
+	"migrateuseraccount-form-username": "使用者名稱",
+	"migrateuseraccount-form-username-help": "這是您想要從舊wiki上遷移的帳號。",
+	"migrateuseraccount-form-newusername": "新的使用者名稱",
+	"migrateuseraccount-form-newusername-help": "使用者名稱為'''$1'''的使用者已存在。請再輸入一個您在本wiki上想要使用的使用者名稱。",
+	"migrateuseraccount-migrated-log-entry": "遷移了帳號",
+	"migrateuseraccount-success": "您的帳號已被遷移。您現在可以用您的使用者名稱「$1」和您選定的密碼來[[Special:UserLogin|登入]]。",
+	"migrateuseraccount-failed": "遷移您的帳號時發生了錯誤，請稍後再試。",
+	"migrateuseraccount-invalid-password": "您提供的密碼無效。請確保密碼符合本wiki的需求。",
+	"migrateuseraccount-wrong-confirm-password": "您輸入的兩次密碼並不相符。",
+	"migrateuseraccount-invalid-username": "您輸入的使用者名稱無效或是已經被佔用。"
+}
