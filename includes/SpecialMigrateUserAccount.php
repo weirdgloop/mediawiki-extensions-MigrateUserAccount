@@ -270,8 +270,8 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		// In future, we can check $this->isUsingFallback() to determine whether we're using a fallback username.
 
 		// Set the URL for the user to edit their User page on the remote wiki
-		$this->remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:" . $this->remoteUsername .
-			"?action=edit";
+		$this->remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:"
+			. rawurlencode( $this->remoteUsername ) . "?action=edit";
 
 		// Generate a token
 		$token = $this->generateToken();
