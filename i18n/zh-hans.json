@@ -9,7 +9,7 @@
 	"migrateuseraccount-loginprompt": "若您需要将您的旧账号迁移至本wiki，请按照[[Special:迁移用户账号]]上的步骤操作。",
 	"migrateuseraccount-error-loggedin": "您已经登录。若您需要迁移另一个账号，请先退出。",
 	"migrateuseraccount-error-user-invalid": "您输入的用户不存在或已经完成迁移了。",
-	"migrateuseraccount-help": "本页面可以让您通过在旧wiki上验证身份来迁移账号。''这只需要一分钟'''，而且您可以认领您的编辑历史和贡献。",
+	"migrateuseraccount-help": "本页面可以让您通过在旧wiki上验证身份来迁移账号。'''这只需要一分钟'''，而且您可以认领您的编辑历史和贡献。",
 	"migrateuseraccount-form-password-help": "这是您在本wiki上想要使用的密码。",
 	"migrateuseraccount-token-title": "$1的密钥为：$2",
 	"migrateuseraccount-token-help": "请'''在登录状态下'''编辑您在旧wiki上的用户页，并把这串密钥粘贴在页面内容或编辑摘要中。您可以在此处编辑您在旧wiki的用户页：$1",
