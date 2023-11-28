@@ -14,6 +14,14 @@ $specialPageAliases['zh-hans'] = [
 	'MigrateUserAccount' => [ '迁移用户账号' ],
 ];
 
+$specialPageAliases['zh-hant'] = [
+	'MigrateUserAccount' => [ '遷移使用者帳號' ],
+];
+
+$specialPageAliases['zh-hk'] = [
+	'MigrateUserAccount' => [ '遷移用戶帳號' ],
+];
+
 $specialPageAliases['uk'] = [
 	'MigrateUserAccount' => [ 'Перенестисвійакаунт' ],
 ];
