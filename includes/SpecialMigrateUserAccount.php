@@ -292,7 +292,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			$password = $vals['wppassword'];
 			$confirmPassword = $vals['wpconfirmpassword'];
-			$newUsername = $vals['wpnewusername'];
+			$newUsername = $vals['wpnewusername'] ?? null;
 
 			// Anything past this point assumes that we have the information we need to change their credentials
 
