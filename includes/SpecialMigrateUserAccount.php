@@ -24,9 +24,9 @@ use ErrorPageError;
 use ExtensionRegistry;
 use HTMLForm;
 use LogPage;
-use MediaWiki\Extension\Renameuser\RenameuserSQL;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\RenameUser\RenameuserSQL;
 use MediaWiki\Session\Session;
 use MediaWiki\User\UserFactory;
 use MediaWiki\User\UserNameUtils;
@@ -337,19 +337,6 @@ class SpecialMigrateUserAccount extends SpecialPage {
 					$this->showFinalForm();
 					return true;
 				} else {
-					// Check whether Renameuser is loaded, as we have a dependency on it for users that have
-					// a conflicting username.
-					if ( !$this->extensionRegistry->isLoaded( 'Renameuser' ) ) {
-						$this->logger->critical( 'Renameuser is not loaded. Cannot rename users with fallback names.' );
-
-						$this->getOutput()->addHTML(
-							\Html::errorBox(
-								$this->msg( 'migrateuseraccount-failed' )->text()
-							)
-						);
-						return true;
-					}
-
 					$rename = new RenameuserSQL(
 						$user->getName(),
 						$newUser->getName(),
