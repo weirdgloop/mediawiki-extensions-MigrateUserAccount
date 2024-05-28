@@ -103,6 +103,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$this->userNameUtils = MediaWikiServices::getInstance()->getUserNameUtils();
 		$this->userFactory = MediaWikiServices::getInstance()->getUserFactory();
 
+		$this->getOutput()->disallowUserJs();
 		$this->checkReadOnly();
 		$this->getOutput()->enableOOUI();
 		$this->getOutput()->addModules( 'special.migrateuseraccount' );
