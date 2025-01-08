@@ -6,7 +6,7 @@
 	},
 	"migrateuseraccount": "Przenieś konto użytkownika",
 	"migrateuseraccount-desc": "Pozwala użytkownikom odzyskać swoje konto na wiki przez zweryfikowanie swojej tożsamości na zewnętrznej wiki",
-	"migrateuseraccount-loginprompt": "Jeśli chcesz przenieść swoje stare konto na tę wiki, wykonaj instrukcje na [[Specical:MigrateUserAccount]]",
+	"migrateuseraccount-loginprompt": "Jeśli chcesz przenieść swoje stare konto na tę wiki, wykonaj instrukcje na [[Special:MigrateUserAccount]]",
 	"migrateuseraccount-error-loggedin": "Jesteś już zalogowany. Jeśli chcesz przenieść inne konto, najpierw się wyloguj.",
 	"migrateuseraccount-error-user-invalid": "Użytkownik, którego podałeś, nie istnieje, albo został już przeniesiony.",
 	"migrateuseraccount-help": "Ta strona pozwala ci przenieść twoje stare konto na tę wiki, przez zweryfikowanie twojej tożsamości na starej wiki. '''To zajmie tylko minutę''' i pozwoli ci odzyskać swoją historię edycji i wkład.",
