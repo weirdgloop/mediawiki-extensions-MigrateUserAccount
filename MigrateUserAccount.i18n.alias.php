@@ -49,3 +49,7 @@ $specialPageAliases['ru'] = [
 $specialPageAliases['th'] = [
 	'MigrateUserAccount' => [ 'โยกย้ายบัญชีผู้ใช้' ]
 ];
+
+$specialPageAliases['pl'] = [
+	'MigrateUserAccount' => [ 'Przenieś konto użytkownika' ]
+];
