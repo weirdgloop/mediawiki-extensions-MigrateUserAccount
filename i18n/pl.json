@@ -1,0 +1,32 @@
+{
+	"@metadata": {
+		"authors": [
+			"Grzesiek11"
+		]
+	},
+	"migrateuseraccount": "Przenieś konto użytkownika",
+	"migrateuseraccount-desc": "Pozwala użytkownikom odzyskać swoje konto na wiki przez zweryfikowanie swojej tożsamości na zewnętrznej wiki",
+	"migrateuseraccount-loginprompt": "Jeśli chcesz przenieść swoje stare konto na tę wiki, wykonaj instrukcje na [[Specical:MigrateUserAccount]]",
+	"migrateuseraccount-error-loggedin": "Jesteś już zalogowany. Jeśli chcesz przenieść inne konto, najpierw się wyloguj.",
+	"migrateuseraccount-error-user-invalid": "Użytkownik, którego podałeś, nie istnieje, albo został już przeniesiony.",
+	"migrateuseraccount-help": "Ta strona pozwala ci przenieść twoje stare konto na tę wiki, przez zweryfikowanie twojej tożsamości na starej wiki. '''To zajmie tylko minutę''' i pozwoli ci odzyskać swoją historię edycji i wkład.",
+	"migrateuseraccount-form-password-help": "To jest hasło, którego chciałbyś używać na tej wiki.",
+	"migrateuseraccount-token-title": "Token $1 to: $2",
+	"migrateuseraccount-token-help": "Zedytuj swoją stronę użytkownika na poprzedniej wiki '''będąc zalogowanym''' i wklej ten token do treści lub opisu zmian. Możesz edytować swoja stronę użytkownika na poprzedniej wiki tutaj: $1",
+	"migrateuseraccount-token-button": "Dodałem token",
+	"migrateuseraccount-token-no-token": "Nie mogliśmy znaleźć tokenu. Upewnij się, że jest w treści lub opisie najnowszej zmiany na $1.",
+	"migrateuseraccount-token-no-recent-edit": "Nie wykonano żadnych zmian na $1 w ciągu ostatnich 10 minut. Upewnij się, że edytujesz odpowiednią stronę.",
+	"migrateuseraccount-token-username-no-match": "Ostatnia zmiana na $1 została wykonana ze złego konta. Upewnij się, że jesteś zalogowany na odpowiednie konto.",
+	"migrateuseraccount-form-password": "Nowe hasło",
+	"migrateuseraccount-form-confirm-password": "Potwierdź nowe hasło",
+	"migrateuseraccount-form-username": "Nazwa użytkownika",
+	"migrateuseraccount-form-username-help": "To jest konto, które chciałbyś przenieść ze starej wiki.",
+	"migrateuseraccount-form-newusername": "Nowa nazwa użytkownika",
+	"migrateuseraccount-form-newusername-help": "Użytkownik o nazwie '''$1''' już istnieje. Wprowadź inną nazwę użytkownika, której chciałbyś używać na tej wiki.",
+	"migrateuseraccount-migrated-log-entry": "przeniósł swoje konto",
+	"migrateuseraccount-success": "Twoje konto zostało przeniesione. Możesz teraz [[Special:UserLogin|zalogować się]] swoją nazwą użytkownika \"$1\" i wybranym hasłem.",
+	"migrateuseraccount-failed": "Wystąpił problem podczas przenoszenia twojego konta. Spróbuj ponownie później.",
+	"migrateuseraccount-invalid-password": "Hasło, które wprowadziłeś, jest nieprawidłowe. Upewnij się, że spełnia wymagania dla tej wiki.",
+	"migrateuseraccount-wrong-confirm-password": "Hasła, które wprowadziłeś, nie zgadzają się.",
+	"migrateuseraccount-invalid-username": "Nowa nazwa użytkownika, którą wprowadziłeś, jest niepoprawna, lub jest już w użyciu."
+}
