@@ -224,7 +224,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				// If a fallback suffix is not set, or we tried with the fallback suffix and no dice, show an error
 				$this->getOutput()->addHTML(
 					\Html::errorBox(
-						$this->msg( 'migrateuseraccount-error-user-invalid' )->text()
+						$this->msg( 'migrateuseraccount-error-user-invalid' )->parse()
 					)
 				);
 				$this->showForm();
@@ -300,7 +300,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			if ( $password !== $confirmPassword ) {
 				$this->getOutput()->addHTML(
 					\Html::errorBox(
-						$this->msg( 'migrateuseraccount-wrong-confirm-password' )->text()
+						$this->msg( 'migrateuseraccount-wrong-confirm-password' )->parse()
 					)
 				);
 				$this->showFinalForm();
@@ -317,7 +317,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			if ( !$user->isValidPassword( $password ) ) {
 				$this->getOutput()->addHTML(
 					\Html::errorBox(
-						$this->msg( 'migrateuseraccount-invalid-password' )->text()
+						$this->msg( 'migrateuseraccount-invalid-password' )->parse()
 					)
 				);
 				$this->showFinalForm();
@@ -331,7 +331,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				if ( $newUser === null || $newUser->isRegistered() ) {
 					$this->getOutput()->addHTML(
 						\Html::errorBox(
-							$this->msg( 'migrateuseraccount-invalid-username' )->text()
+							$this->msg( 'migrateuseraccount-invalid-username' )->parse()
 						)
 					);
 					$this->showFinalForm();
@@ -353,7 +353,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 							\Html::errorBox(
 								$this->msg(
 									$this->localUsername . ' could not be renamed to ' . $newUser->getName()
-								)->text()
+								)->parse()
 							)
 						);
 						return true;
@@ -381,7 +381,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 				$this->getOutput()->addHTML(
 					\Html::errorBox(
-						$this->msg( 'migrateuseraccount-failed' )->text()
+						$this->msg( 'migrateuseraccount-failed' )->parse()
 					)
 				);
 				$this->showFinalForm();
@@ -395,7 +395,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			// Password change was successful by this point :)
 			$this->getOutput()->addHTML(
 				\Html::successBox(
-					$this->msg( 'migrateuseraccount-success', $user->getName() )
+					$this->msg( 'migrateuseraccount-success', $user->getName() )->parse()
 				)
 			);
 
@@ -409,9 +409,9 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			// If they have not edited their page, show information on how to verify their identity
 			$this->getOutput()->addHTML(
 				'<div class="mua-token-details"><h3>' . $this->msg( 'migrateuseraccount-token-title',
-				$this->remoteUsername, '<code>' . $token . '</code>' ) . '</h3><br />' .
+				$this->remoteUsername, '<code>' . $token . '</code>' )->parse() . '</h3><br />' .
 				$this->msg( 'migrateuseraccount-token-help',
-					$this->remoteUrl ) . '</div><br />'
+					$this->remoteUrl )->parse() . '</div><br />'
 			);
 
 			$desc = [
@@ -468,14 +468,14 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 						if ( $editTimestamp && ( $editTimestamp < ( $currTimestamp - 10 * 60 ) ) ) {
 							return $this->getOutput()->msg( 'migrateuseraccount-token-no-recent-edit',
-								'[' . $this->remoteUrl . ' ' . urlencode( $this->remoteUsername ) . ']' );
+								'[' . $this->remoteUrl . ' ' . urlencode( $this->remoteUsername ) . ']' )->parse();
 						}
 					}
 
 					// If the username of the most recent edit is not the target user, show a special error message
 					if ( !isset( $revision['user'] ) || $revision['user'] !== $this->remoteUsername ) {
 						return $this->getOutput()->msg( 'migrateuseraccount-token-username-no-match',
-							'[' . $this->remoteUrl . ' ' . urlencode( $this->remoteUsername ) . ']' );
+							'[' . $this->remoteUrl . ' ' . urlencode( $this->remoteUsername ) . ']' )->parse();
 					}
 
 					// Get the slots (for the revision content)
@@ -498,7 +498,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			return true;
 		} else {
 			return $this->getOutput()->msg( 'migrateuseraccount-token-no-token',
-				'[' . $this->remoteUrl . ' ' . urlencode( $this->remoteUsername ) . ']' );
+				'[' . $this->remoteUrl . ' ' . urlencode( $this->remoteUsername ) . ']' )->parse();
 		}
 	}
 
