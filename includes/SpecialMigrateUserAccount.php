@@ -25,6 +25,7 @@ use ExtensionRegistry;
 use HTMLForm;
 use LogPage;
 use MediaWiki\Logger\LoggerFactory;
+use MediaWiki\MainConfigNames;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\RenameUser\RenameuserSQL;
 use MediaWiki\Session\Session;
@@ -184,6 +185,15 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			]
 		];
 
+		$config = $this->getConfig();
+		if ( $config->get( MainConfigNames::EnableEmail ) && $config->get( 'MUAShowEmailField' ) ) {
+			$desc['email'] = [
+				'type' => 'email',
+				'label-message' => 'migrateuseraccount-form-email',
+				'help-message' => 'migrateuseraccount-form-email-help',
+			];
+		}
+
 		if ( $this->isUsingFallback() ) {
 			$desc['newusername'] = [
 				'class' => 'HTMLTextField',
@@ -293,6 +303,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			$password = $vals['wppassword'];
 			$confirmPassword = $vals['wpconfirmpassword'];
+			$email = $vals['wpemail'] ?? null;
 			$newUsername = $vals['wpnewusername'] ?? null;
 
 			// Anything past this point assumes that we have the information we need to change their credentials
@@ -302,6 +313,16 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				$this->getOutput()->addHTML(
 					\Html::errorBox(
 						$this->msg( 'migrateuseraccount-wrong-confirm-password' )->parse()
+					)
+				);
+				$this->showFinalForm();
+				return true;
+			}
+
+			if ( !empty( $email ) && !filter_var( $email, FILTER_VALIDATE_EMAIL ) ) {
+				$this->getOutput()->addHTML(
+					\Html::errorBox(
+						$this->msg( 'migrateuseraccount-invalid-email' )->parse()
 					)
 				);
 				$this->showFinalForm();
@@ -389,6 +410,19 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				return true;
 			}
 
+			$emailMessage = '';
+			if ( !empty( $email ) ) {
+				$status = $user->setEmailWithConfirmation( $email );
+				if ( !$status->isGood() ) {
+					$this->logger->error( $this->localUsername . ' failed to change email: ' .
+						$status->getMessage()->text()
+					);
+					$emailMessage = $this->msg( 'migrateuseraccount-email-failed' )->parse();
+				} else if ( $status->value === 'eauth' ) {
+					$emailMessage = $this->msg( 'migrateuseraccount-email-confirm', $email )->parse();
+				}
+			}
+
 			$this->logger->info( $user->getName() . ' has migrated their account successfully from ' .
 				$this->getConfig()->get( 'MUARemoteWikiAPI' )
 			);
@@ -396,7 +430,8 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			// Password change was successful by this point :)
 			$this->getOutput()->addHTML(
 				\Html::successBox(
-					$this->msg( 'migrateuseraccount-success', $user->getName() )->parse()
+					$this->msg( 'migrateuseraccount-success', $user->getName() )->parse() .
+					'<br />' . $emailMessage
 				)
 			);
 
