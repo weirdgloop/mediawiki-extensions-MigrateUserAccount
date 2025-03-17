@@ -24,6 +24,8 @@ use MediaWiki\Exception\ErrorPageError;
 use MediaWiki\Html\Html;
 use MediaWiki\HTMLForm\HTMLForm;
 use MediaWiki\Logger\LoggerFactory;
+use MediaWiki\MainConfigNames;
+use MediaWiki\Parser\Sanitizer;
 use MediaWiki\Session\Session;
 use MediaWiki\SpecialPage\SpecialPage;
 use MediaWiki\User\UserNameUtils;
@@ -144,6 +146,15 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			]
 		];
 
+		$config = $this->getConfig();
+		if ( $config->get( MainConfigNames::EnableEmail ) && $config->get( 'MUAShowEmailField' ) ) {
+			$desc['email'] = [
+				'type' => 'email',
+				'label-message' => 'migrateuseraccount-form-email',
+				'help-message' => 'migrateuseraccount-form-email-help',
+			];
+		}
+
 		if ( $this->isUsingFallback() ) {
 			$desc['newusername'] = [
 				'class' => 'HTMLTextField',
@@ -211,6 +222,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			$password = $vals['wppassword'];
 			$confirmPassword = $vals['wpconfirmpassword'];
+			$email = $vals['wpemail'] ?? null;
 			$newUsername = $vals['wpnewusername'] ?? null;
 
 			// Anything past this point assumes that we have the information we need to change their credentials
@@ -220,6 +232,16 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				$this->getOutput()->addHTML(
 					Html::errorBox(
 						$this->msg( 'migrateuseraccount-wrong-confirm-password' )->parse()
+					)
+				);
+				$this->showFinalForm();
+				return true;
+			}
+
+			if ( !empty( $email ) && !Sanitizer::validateEmail( $email ) ) {
+				$this->getOutput()->addHTML(
+					Html::errorBox(
+						$this->msg( 'migrateuseraccount-invalid-email' )->parse()
 					)
 				);
 				$this->showFinalForm();
@@ -241,10 +263,25 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				return true;
 			}
 
+			$user = $result->getValue();
+			$emailMessage = '';
+			if ( !empty( $email ) ) {
+				$status = $user->setEmailWithConfirmation( $email );
+				if ( !$status->isGood() ) {
+					$this->logger->error( $this->localUsername . ' failed to change email: ' .
+						$status->getMessage()->text()
+					);
+					$emailMessage = $this->msg( 'migrateuseraccount-email-failed' )->parse();
+				} else if ( $status->value === 'eauth' ) {
+					$emailMessage = $this->msg( 'migrateuseraccount-email-confirm', $email )->parse();
+				}
+			}
+
 			// Password change was successful by this point :)
 			$this->getOutput()->addHTML(
 				Html::successBox(
-					$this->msg( 'migrateuseraccount-success', $result->getValue()->getName() )->parse()
+					$this->msg( 'migrateuseraccount-success', $user->getName() )->parse() .
+					'<br />' . $emailMessage
 				)
 			);
 
