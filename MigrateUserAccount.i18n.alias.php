@@ -6,8 +6,40 @@ $specialPageAliases['en'] = [
 	'MigrateUserAccount' => [ 'MigrateUserAccount', 'Migrate User Account' ],
 ];
 
+$specialPageAliases['de'] = [
+	'MigrateUserAccount' => [ 'Benutzerkonto_migrieren' ]
+];
+
+$specialPageAliases['es'] = [
+	'MigrateUserAccount' => [ 'Migrarcuentadeusuario' ]
+];
+
+$specialPageAliases['fr'] = [
+	'MigrateUserAccount' => [ 'Migreruncompteutilisateur' ]
+];
+
+$specialPageAliases['nl'] = [
+	'MigrateUserAccount' => [ 'Gebruikersaccountmigreren' ]
+];
+
+$specialPageAliases['ru'] = [
+	'MigrateUserAccount' => [ 'Перенестиучётнуюзаписьучастника' ]
+];
+
 $specialPageAliases['pt-br'] = [
 	'MigrateUserAccount' => [ 'Migrarcontadeusuário' ],
+];
+
+$specialPageAliases['th'] = [
+	'MigrateUserAccount' => [ 'โยกย้ายบัญชีผู้ใช้' ]
+];
+
+$specialPageAliases['uk'] = [
+	'MigrateUserAccount' => [ 'Перенестисвійакаунт' ],
+];
+
+$specialPageAliases['zh'] = [
+	'MigrateUserAccount' => [ 'MigrateUserAccount' ],
 ];
 
 $specialPageAliases['zh-hans'] = [
@@ -20,32 +52,4 @@ $specialPageAliases['zh-hant'] = [
 
 $specialPageAliases['zh-hk'] = [
 	'MigrateUserAccount' => [ '遷移用戶帳號' ],
-];
-
-$specialPageAliases['uk'] = [
-	'MigrateUserAccount' => [ 'Перенестисвійакаунт' ],
-];
-
-$specialPageAliases['de'] = [
-	'MigrateUserAccount' => [ 'Benutzerkonto_migrieren' ]
-];
-
-$specialPageAliases['fr'] = [
-	'MigrateUserAccount' => [ 'Migreruncompteutilisateur' ]
-];
-
-$specialPageAliases['es'] = [
-	'MigrateUserAccount' => [ 'Migrarcuentadeusuario' ]
-];
-
-$specialPageAliases['nl'] = [
-	'MigrateUserAccount' => [ 'Gebruikersaccountmigreren' ]
-];
-
-$specialPageAliases['ru'] = [
-	'MigrateUserAccount' => [ 'Перенестиучётнуюзаписьучастника' ]
-];
-
-$specialPageAliases['th'] = [
-	'MigrateUserAccount' => [ 'โยกย้ายบัญชีผู้ใช้' ]
 ];
