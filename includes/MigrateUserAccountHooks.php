@@ -19,7 +19,7 @@
 
 namespace MediaWiki\Extension\MigrateUserAccount;
 
-use SpecialPage;
+use MediaWiki\SpecialPage\SpecialPage;
 
 class MigrateUserAccountHooks {
 	/**

@@ -20,10 +20,10 @@
 
 namespace MediaWiki\Extension\MigrateUserAccount;
 
-use ErrorPageError;
-use ExtensionRegistry;
-use HTMLForm;
-use LogPage;
+use MediaWiki\Exception\ErrorPageError;
+use MediaWiki\Registration\ExtensionRegistry;
+use MediaWiki\HTMLForm\HTMLForm;
+use MediaWiki\Logging\LogPage;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\RenameUser\RenameuserSQL;
@@ -31,8 +31,8 @@ use MediaWiki\Session\Session;
 use MediaWiki\User\UserFactory;
 use MediaWiki\User\UserNameUtils;
 use Psr\Log\LoggerInterface;
-use SpecialPage;
-use User;
+use MediaWiki\SpecialPage\SpecialPage;
+use MediaWiki\User\User;
 
 class SpecialMigrateUserAccount extends SpecialPage {
 
