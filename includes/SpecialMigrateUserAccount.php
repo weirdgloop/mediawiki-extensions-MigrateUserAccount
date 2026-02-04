@@ -21,6 +21,7 @@
 namespace MediaWiki\Extension\MigrateUserAccount;
 
 use MediaWiki\Exception\ErrorPageError;
+use MediaWiki\Html\Html;
 use MediaWiki\Registration\ExtensionRegistry;
 use MediaWiki\HTMLForm\HTMLForm;
 use MediaWiki\Logging\LogPage;
@@ -224,7 +225,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 				// If a fallback suffix is not set, or we tried with the fallback suffix and no dice, show an error
 				$this->getOutput()->addHTML(
-					\Html::errorBox(
+					Html::errorBox(
 						$this->msg( 'migrateuseraccount-error-user-invalid' )->parse()
 					)
 				);
@@ -300,7 +301,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			// Check that both passwords match
 			if ( $password !== $confirmPassword ) {
 				$this->getOutput()->addHTML(
-					\Html::errorBox(
+					Html::errorBox(
 						$this->msg( 'migrateuseraccount-wrong-confirm-password' )->parse()
 					)
 				);
@@ -317,7 +318,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			if ( !$user->isValidPassword( $password ) ) {
 				$this->getOutput()->addHTML(
-					\Html::errorBox(
+					Html::errorBox(
 						$this->msg( 'migrateuseraccount-invalid-password' )->parse()
 					)
 				);
@@ -331,7 +332,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 				if ( $newUser === null || $newUser->isRegistered() ) {
 					$this->getOutput()->addHTML(
-						\Html::errorBox(
+						Html::errorBox(
 							$this->msg( 'migrateuseraccount-invalid-username' )->parse()
 						)
 					);
@@ -351,7 +352,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 						$this->logger->error( '.' );
 
 						$this->getOutput()->addHTML(
-							\Html::errorBox(
+							Html::errorBox(
 								$this->msg(
 									$this->localUsername . ' could not be renamed to ' . $newUser->getName()
 								)->parse()
@@ -381,7 +382,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				);
 
 				$this->getOutput()->addHTML(
-					\Html::errorBox(
+					Html::errorBox(
 						$this->msg( 'migrateuseraccount-failed' )->parse()
 					)
 				);
@@ -395,7 +396,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			// Password change was successful by this point :)
 			$this->getOutput()->addHTML(
-				\Html::successBox(
+				Html::successBox(
 					$this->msg( 'migrateuseraccount-success', $user->getName() )->parse()
 				)
 			);
@@ -431,7 +432,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			if ( $vals['wpFormIdentifier'] == 'form2' ) {
 				// If we're here after the second form, it should be because we retried and it didn't work.
-				$this->getOutput()->addHTML( '<br />' . \Html::errorBox(
+				$this->getOutput()->addHTML( '<br />' . Html::errorBox(
 					$verified
 				) );
 			}
