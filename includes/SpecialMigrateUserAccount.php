@@ -22,18 +22,18 @@ namespace MediaWiki\Extension\MigrateUserAccount;
 
 use MediaWiki\Exception\ErrorPageError;
 use MediaWiki\Html\Html;
-use MediaWiki\Registration\ExtensionRegistry;
 use MediaWiki\HTMLForm\HTMLForm;
-use MediaWiki\Logging\LogPage;
 use MediaWiki\Logger\LoggerFactory;
+use MediaWiki\Logging\LogPage;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\Registration\ExtensionRegistry;
 use MediaWiki\RenameUser\RenameuserSQL;
 use MediaWiki\Session\Session;
+use MediaWiki\SpecialPage\SpecialPage;
+use MediaWiki\User\User;
 use MediaWiki\User\UserFactory;
 use MediaWiki\User\UserNameUtils;
 use Psr\Log\LoggerInterface;
-use MediaWiki\SpecialPage\SpecialPage;
-use MediaWiki\User\User;
 
 class SpecialMigrateUserAccount extends SpecialPage {
 
