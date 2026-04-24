@@ -87,6 +87,17 @@
 			"value": "Weird Gloop"
 		}
 	},
+	"RestRoutes": [
+		{
+			"path": "/migrateuseraccount/v0/validatepassword",
+			"method": "POST",
+			"class": "MediaWiki\\Extension\\MigrateUserAccount\\Api\\RestApiCheckPasswordValidity",
+			"services": [
+				"MigrateUserAccount.UserMigrationService",
+				"UserFactory"
+			]
+		}
+	],
 	"ServiceWiringFiles": [
 		"includes/ServiceWiring.php"
 	],

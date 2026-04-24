@@ -4,7 +4,7 @@
  */
 ( function () {
 	mw.hook( 'htmlform.enhance' ).add( function ( $root ) {
-		var api = new mw.Api();
+		var api = new mw.Rest();
 
 		$root.find( '.mw-migrateuseraccount-validate-password.oo-ui-fieldLayout' ).each( function () {
 			var currentApiPromise,
@@ -26,23 +26,18 @@
 				}
 
 				d = $.Deferred();
-				currentApiPromise = api.post( {
-					action: 'validatepassword',
-					password: password,
-					formatversion: 2,
-					errorformat: 'html',
-					errorsuselocal: true,
-					uselang: mw.config.get( 'wgUserLanguage' )
+				currentApiPromise = api.post( '/migrateuseraccount/v0/validatepassword', {
+					username: $root.find( '#mw-input-wpusername' ).val(),
+					password: password
 				} ).done( function ( resp ) {
 					var errors,
-						pwinfo = resp.validatepassword,
-						good = pwinfo.validity === 'Good';
+						good = resp.validity === 'Good' || !Object.keys(resp).length;
 
 					currentApiPromise = undefined;
 
 					if ( !good ) {
-						errors = pwinfo.validitymessages.map( function ( m ) {
-							return new OO.ui.HtmlSnippet( m.html );
+						errors = resp.validitymessages.map( function ( m ) {
+							return new OO.ui.HtmlSnippet( m );
 						} );
 					}
 					self.setErrors( errors || [] );
