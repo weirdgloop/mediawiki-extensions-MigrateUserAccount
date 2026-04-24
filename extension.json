@@ -20,7 +20,11 @@
 	},
 	"SpecialPages": {
 		"MigrateUserAccount": {
-			"class": "MediaWiki\\Extension\\MigrateUserAccount\\SpecialMigrateUserAccount"
+			"class": "MediaWiki\\Extension\\MigrateUserAccount\\SpecialMigrateUserAccount",
+			"services": [
+				"UserNameUtils",
+				"MigrateUserAccount.UserMigrationService"
+			]
 		}
 	},
 	"MessagesDirs": {
@@ -83,5 +87,8 @@
 			"value": "Weird Gloop"
 		}
 	},
+	"ServiceWiringFiles": [
+		"includes/ServiceWiring.php"
+	],
 	"manifest_version": 2
 }

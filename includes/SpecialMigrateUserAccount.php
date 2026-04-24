@@ -24,65 +24,32 @@ use MediaWiki\Exception\ErrorPageError;
 use MediaWiki\Html\Html;
 use MediaWiki\HTMLForm\HTMLForm;
 use MediaWiki\Logger\LoggerFactory;
-use MediaWiki\Logging\LogPage;
-use MediaWiki\MediaWikiServices;
-use MediaWiki\Registration\ExtensionRegistry;
-use MediaWiki\RenameUser\RenameuserSQL;
 use MediaWiki\Session\Session;
 use MediaWiki\SpecialPage\SpecialPage;
-use MediaWiki\User\User;
-use MediaWiki\User\UserFactory;
 use MediaWiki\User\UserNameUtils;
 use Psr\Log\LoggerInterface;
 
 class SpecialMigrateUserAccount extends SpecialPage {
+	private Session $session;
 
-	/**
-	 * @var Session
-	 */
-	private $session;
+	private string $localUsername;
 
-	/**
-	 * @var string
-	 */
-	private $localUsername;
+	private string $remoteUsername;
 
-	/**
-	 * @var string
-	 */
-	private $remoteUsername;
+	private LoggerInterface $logger;
 
-	/**
-	 * @var LoggerInterface
-	 */
-	private $logger;
+	private UserNameUtils $userNameUtils;
 
-	/**
-	 * @var UserNameUtils
-	 */
-	private $userNameUtils;
+	private UserMigrationService $userMigrationService;
 
-	/**
-	 * @var UserFactory
-	 */
-	private $userFactory;
-
-	/**
-	 * @var ExtensionRegistry
-	 */
-	private $extensionRegistry;
-
-	/**
-	 * @var string
-	 */
-	private string $remoteUrl;
-
-	private string $fallbackSuffix;
-
-	private string $renameActor;
-
-	public function __construct() {
+	public function __construct(
+		UserNameUtils $userNameUtils,
+		UserMigrationService $userMigrationService
+	) {
 		parent::__construct( 'MigrateUserAccount' );
+		$this->userNameUtils = $userNameUtils;
+		$this->userMigrationService = $userMigrationService;
+		$this->logger = LoggerFactory::getInstance( 'MigrateUserAccount' );
 	}
 
 	/**
@@ -95,23 +62,15 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	}
 
 	/**
-	 * @param string|null $par
+	 * @param string|null $subPage
 	 * @return void
 	 */
-	public function execute( $par ) {
-		$this->logger = LoggerFactory::getInstance( 'MigrateUserAccount' );
-		$this->extensionRegistry = ExtensionRegistry::getInstance();
-		$this->userNameUtils = MediaWikiServices::getInstance()->getUserNameUtils();
-		$this->userFactory = MediaWikiServices::getInstance()->getUserFactory();
-
+	public function execute( $subPage ) {
 		$this->getOutput()->disallowUserJs();
 		$this->checkReadOnly();
 		$this->getOutput()->enableOOUI();
 		$this->getOutput()->addModules( 'special.migrateuseraccount' );
 		$this->getOutput()->addModuleStyles( [ 'ext.migrateuseraccount.styles' ] );
-
-		$this->fallbackSuffix = $this->getConfig()->get( 'MUAFallbackSuffix' );
-		$this->renameActor = $this->getConfig()->get( 'MUAFallbackRenameActor' );
 
 		if ( version_compare( MW_VERSION, '1.38', '>=' ) ) {
 			$this->getOutput()->disableClientCache();
@@ -130,7 +89,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 		$this->getOutput()->addWikiMsg( 'migrateuseraccount-help' );
 
-		parent::execute( $par );
+		parent::execute( $subPage );
 
 		if ( !$this->getRequest()->wasPosted() ) {
 			// Wasn't POSTed, show the form
@@ -203,53 +162,6 @@ class SpecialMigrateUserAccount extends SpecialPage {
 	}
 
 	/**
-	 * @return bool
-	 */
-	public function checkUserCanMigrate(): bool {
-		$isFallback = false;
-
-		while ( true ) {
-			// Ensure that the user is a stub (has no password set) before continuing
-			$dbr = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_REPLICA );
-			$row = $dbr->selectRow( 'user', [
-				'user_id', 'user_password', 'user_is_temp' ], [ 'user_name' => $this->localUsername ],
-				__METHOD__ );
-
-			if ( !$row || $row->user_password != '' || $row->user_is_temp ) {
-				// User is not a stub
-				if ( !empty( $this->fallbackSuffix && !$isFallback ) ) {
-					// If a fallback suffix is set, try again but with that suffix
-					$this->localUsername = $this->localUsername . $this->fallbackSuffix;
-					$isFallback = true;
-					continue;
-				}
-
-				// If a fallback suffix is not set, or we tried with the fallback suffix and no dice, show an error
-				$this->getOutput()->addHTML(
-					Html::errorBox(
-						$this->msg( 'migrateuseraccount-error-user-invalid' )->parse()
-					)
-				);
-				$this->showForm();
-				return false;
-			}
-
-			break;
-		}
-
-		return true;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function generateToken(): string {
-		$secret = pack( 'H*', $this->getConfig()->get( 'MUATokenSecret' ) );
-		$token = hash_hmac( 'sha256', $this->localUsername . ':' . $this->session->getId(), $secret );
-		return base64_encode( pack( 'H*', substr( $token, 0, 16 ) ) );
-	}
-
-	/**
 	 * @return bool|void
 	 */
 	public function showTokenDetails() {
@@ -262,31 +174,34 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		// Check whether the user can migrate. This does a few things:
 		// - Does the user already exist?
 		// - If the user does exist, and we have a fallback suffix defined, does a fallback user exist?
-		$canMigrate = $this->checkUserCanMigrate();
-		if ( !$canMigrate ) {
-			// User cannot migrate, jump out
+		$canMigrate = $this->userMigrationService->checkUserCanMigrate( $this->localUsername );
+		if ( !$canMigrate->isGood() ) {
+			$this->getOutput()->addHTML(
+				Html::errorBox(
+					$this->msg( $canMigrate->getMessages()[0] )->parse()
+				)
+			);
+			$this->showForm();
 			return false;
 		}
+
+		$this->localUsername = $canMigrate->getValue();
 
 		// At this point, $this->localUsername may have changed, if we've defined a fallback username.
 		// For other non-Weird Gloop users of this extension, a fallback username will not be used here.
 		// In future, we can check $this->isUsingFallback() to determine whether we're using a fallback username.
 
-		// Set the URL for the user to edit their User page on the remote wiki
-		$this->remoteUrl = $this->getConfig()->get( 'MUARemoteWikiContentPath' ) . "User:"
-			. rawurlencode( $this->remoteUsername ) . "?action=edit";
-
 		// Generate a token
-		$token = $this->generateToken();
+		$token = $this->userMigrationService->generateToken( $this->localUsername, $this->session );
 
 		$this->logger->debug( $this->localUsername . ' generated a new migration token for ' .
 			$this->getConfig()->get( 'MUARemoteWikiAPI' )
 		);
 
 		// Check if user has edited their page with the token (will either be `true` or a string to an error msg)
-		$verified = $this->verifyToken( $token );
+		$verified = $this->userMigrationService->verifyToken( $this->remoteUsername, $token );
 
-		if ( $verified === true ) {
+		if ( $verified->isGood() ) {
 			if ( !array_key_exists( 'wppassword', $vals ) || !array_key_exists( 'wpconfirmpassword', $vals ) ) {
 				// At this point, if a password hasn't been passed to us yet, show them the final form to provide it
 				$this->showFinalForm();
@@ -310,102 +225,27 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				return true;
 			}
 
-			$user = $this->userFactory->newFromName( $this->localUsername );
-
-			if ( !$user->isRegistered() ) {
-				// This should never happen, but if we somehow reach this, abort with an error.
-				$this->logger->error( $this->localUsername . ' is not registered, so we aborted the migration.' );
-			}
-
-			if ( !$user->isValidPassword( $password ) ) {
-				$this->getOutput()->addHTML(
-					Html::errorBox(
-						$this->msg( 'migrateuseraccount-invalid-password' )->parse()
-					)
-				);
-				$this->showFinalForm();
-				return true;
-			}
-
-			// For users with conflicting usernames, they'll have entered a new username at this point.
-			if ( $this->isUsingFallback() && $newUsername !== null ) {
-				$newUser = $this->userFactory->newFromName( $newUsername, $this->userFactory::RIGOR_CREATABLE );
-
-				if ( $newUser === null || $newUser->isRegistered() ) {
-					$this->getOutput()->addHTML(
-						Html::errorBox(
-							$this->msg( 'migrateuseraccount-invalid-username' )->parse()
-						)
-					);
-					$this->showFinalForm();
-					return true;
-				} else {
-					$rename = new RenameuserSQL(
-						$user->getName(),
-						$newUser->getName(),
-						$user->getId(),
-						User::newSystemUser( $this->renameActor, [ 'steal' => true ] )
-					);
-
-					// Perform the rename
-					$res = $rename->rename();
-					if ( !$res ) {
-						$this->logger->error( '.' );
-
-						$this->getOutput()->addHTML(
-							Html::errorBox(
-								$this->msg(
-									$this->localUsername . ' could not be renamed to ' . $newUser->getName()
-								)->parse()
-							)
-						);
-						return true;
-					} else {
-						// If the rename was successful, load an updated User object
-						$user = $this->userFactory->newFromName( $newUser->getName() );
-
-						$this->logger->info( $this->localUsername . ' has renamed their account to ' .
-							$user->getName()
-						);
-					}
-				}
-			}
-
-			// Change user's credentials
-			$status = $user->changeAuthenticationData( [
-				'password' => $password,
-				'retype' => $password
-			] );
-
-			if ( !$status->isGood() ) {
-				$this->logger->error( $this->localUsername . ' failed to change auth data: ' .
-					$status->getMessage()->text()
-				);
-
-				$this->getOutput()->addHTML(
-					Html::errorBox(
-						$this->msg( 'migrateuseraccount-failed' )->parse()
-					)
-				);
-				$this->showFinalForm();
-				return true;
-			}
-
-			$this->logger->info( $user->getName() . ' has migrated their account successfully from ' .
-				$this->getConfig()->get( 'MUARemoteWikiAPI' )
+			// Actually perform the migration
+			$result = $this->userMigrationService->migrateUser(
+				$this->localUsername,
+				$password,
+				( $this->isUsingFallback() && $newUsername !== null ) ? $newUsername : null
 			);
+
+			if ( !$result->isGood() ) {
+				$this->getOutput()->addHTML(
+					Html::errorBox( $this->msg( $result->getMessages()[0]->getKey() )->parse() )
+				);
+				$this->showFinalForm();
+				return true;
+			}
 
 			// Password change was successful by this point :)
 			$this->getOutput()->addHTML(
 				Html::successBox(
-					$this->msg( 'migrateuseraccount-success', $user->getName() )->parse()
+					$this->msg( 'migrateuseraccount-success', $result->getValue()->getName() )->parse()
 				)
 			);
-
-			// Save to the on-wiki log, if enabled
-			if ( $this->getConfig()->get( 'MUALogToWiki' ) ) {
-				$this->saveToLog( $user );
-			}
 
 			return true;
 		} else {
@@ -414,7 +254,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				'<div class="mua-token-details"><h3>' . $this->msg( 'migrateuseraccount-token-title',
 				$this->remoteUsername, '<code>' . $token . '</code>' )->parse() . '</h3><br />' .
 				$this->msg( 'migrateuseraccount-token-help',
-					$this->remoteUrl )->parse() . '</div><br />'
+					$this->userMigrationService->getRemoteUrl( $this->remoteUsername ) )->parse() . '</div><br />'
 			);
 
 			$desc = [
@@ -434,90 +274,11 @@ class SpecialMigrateUserAccount extends SpecialPage {
 			if ( $vals['wpFormIdentifier'] == 'form2' ) {
 				// If we're here after the second form, it should be because we retried and it didn't work.
 				$this->getOutput()->addHTML( '<br />' . Html::errorBox(
-					$verified
+					$this->msg( $verified->getMessages()[0]->getKey(),
+						$verified->getMessages()[0]->getParams() )->parse()
 				) );
 			}
 		}
-	}
-
-	/**
-	 * @param string $token
-	 * @return bool|string
-	 */
-	private function verifyToken( string $token ) {
-		$un = rawurlencode( $this->remoteUsername );
-		$textToTest = '';
-
-		$url = $this->getConfig()->get( 'MUARemoteWikiAPI' ) .
-			'?format=json&formatversion=2&action=query&prop=revisions&titles=User:' . $un .
-			'&rvprop=comment|content|timestamp|user&rvlimit=1&rvslots=main';
-		$res = MediaWikiServices::getInstance()->getHttpRequestFactory()->get( $url );
-
-		if ( $res ) {
-			$data = json_decode( $res, true );
-
-			// Get the first page
-			if ( isset( $data['query']['pages'] ) ) {
-				$firstPage = current( $data['query']['pages'] );
-
-				// Get the first revision
-				if ( isset( $firstPage['revisions'] ) ) {
-					$revision = current( $firstPage['revisions'] );
-
-					// If the most recent edit was more than 10 minutes ago, show a special error message
-					if ( isset( $revision['timestamp'] ) ) {
-						$currTimestamp = time();
-						$editTimestamp = strtotime( $revision['timestamp'] );
-
-						if ( $editTimestamp && ( $editTimestamp < ( $currTimestamp - 10 * 60 ) ) ) {
-							return $this->getOutput()->msg( 'migrateuseraccount-token-no-recent-edit',
-								'[' . $this->remoteUrl . ' ' . urlencode( $this->remoteUsername ) . ']' )->parse();
-						}
-					}
-
-					// If the username of the most recent edit is not the target user, show a special error message
-					if ( !isset( $revision['user'] ) || $revision['user'] !== $this->remoteUsername ) {
-						return $this->getOutput()->msg( 'migrateuseraccount-token-username-no-match',
-							'[' . $this->remoteUrl . ' ' . urlencode( $this->remoteUsername ) . ']' )->parse();
-					}
-
-					// Get the slots (for the revision content)
-					if ( isset( $revision['slots'] ) ) {
-						$textToTest = $textToTest . trim( $revision['slots']['main']['content'] );
-					}
-
-					// Get the edit summary
-					if ( isset( $revision['comment'] ) ) {
-						$textToTest = $textToTest . trim( $revision['comment'] );
-					}
-				}
-			}
-		} else {
-			$this->logger->error( 'Got an invalid response from ' . $url );
-		}
-
-		// If the token is present in the text we're testing, then this was successful
-		if ( str_contains( $textToTest, $token ) ) {
-			return true;
-		} else {
-			return $this->getOutput()->msg( 'migrateuseraccount-token-no-token',
-				'[' . $this->remoteUrl . ' ' . urlencode( $this->remoteUsername ) . ']' )->parse();
-		}
-	}
-
-	/**
-	 * @param User $user
-	 * @return void
-	 */
-	private function saveToLog( User $user ) {
-		$log = new LogPage( 'newusers' );
-		$log->addEntry(
-			'migrated',
-			$user->getUserPage(),
-			'',
-			[ $user->getId() ],
-			$user
-		);
 	}
 
 	public function doesWrites(): bool {
