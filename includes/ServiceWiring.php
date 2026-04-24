@@ -11,7 +11,8 @@ return [
 			$services->getUserFactory(),
 			$services->getMainConfig(),
 			$services->getDBLoadBalancer(),
-			$services->getHttpRequestFactory()
+			$services->getHttpRequestFactory(),
+			$services->getMainWANObjectCache()
 		);
 	}
 ];

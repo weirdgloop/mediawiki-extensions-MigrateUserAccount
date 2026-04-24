@@ -202,6 +202,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$verified = $this->userMigrationService->verifyToken( $this->remoteUsername, $token );
 
 		if ( $verified->isGood() ) {
+			// Persist the target username in the Session object, so that we can check it during API calls
 			if ( !array_key_exists( 'wppassword', $vals ) || !array_key_exists( 'wpconfirmpassword', $vals ) ) {
 				// At this point, if a password hasn't been passed to us yet, show them the final form to provide it
 				$this->showFinalForm();

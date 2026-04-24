@@ -13,6 +13,8 @@ use MediaWiki\User\UserFactory;
 use MediaWiki\User\UserRigorOptions;
 use Psr\Log\LoggerInterface;
 use StatusValue;
+use Wikimedia\LightweightObjectStore\ExpirationAwareness;
+use Wikimedia\ObjectCache\WANObjectCache;
 use Wikimedia\Rdbms\ILoadBalancer;
 
 class UserMigrationService {
@@ -28,18 +30,22 @@ class UserMigrationService {
 
 	private HttpRequestFactory $httpRequestFactory;
 
+	private WANObjectCache $wanCache;
+
 	public function __construct(
 		RenameUserFactory $renameUserFactory,
 		UserFactory $userFactory,
 		Config $config,
 		ILoadBalancer $loadBalancer,
-		HttpRequestFactory $httpRequestFactory
+		HttpRequestFactory $httpRequestFactory,
+		WANObjectCache $wanCache
 	) {
 		$this->renameUserFactory = $renameUserFactory;
 		$this->userFactory = $userFactory;
 		$this->config = $config;
 		$this->loadBalancer = $loadBalancer;
 		$this->httpRequestFactory = $httpRequestFactory;
+		$this->wanCache = $wanCache;
 		$this->logger = LoggerFactory::getInstance( 'MigrateUserAccount' );
 	}
 
@@ -171,6 +177,13 @@ class UserMigrationService {
 	 */
 	public function verifyToken( string $remoteUsername, string $token ) {
 		$status = StatusValue::newGood();
+		$wanKey = $this->wanCache->makeKey( 'migrateuseraccount', 'verify', $remoteUsername, $token );
+
+		if ( $this->wanCache->get( $wanKey ) ) {
+			// Token was verified within the last 10 mins, no need to redo our work
+			return $status;
+		}
+
 		$un = rawurlencode( $remoteUsername );
 		$textToTest = '';
 
@@ -225,6 +238,13 @@ class UserMigrationService {
 
 		// If the token is present in the text we're testing, then this was successful
 		if ( str_contains( $textToTest, $token ) ) {
+			// Set a temporary WAN cache key so that we can verify the token for the next 10 min without more API calls
+			$this->wanCache->set(
+				$wanKey,
+				true,
+				ExpirationAwareness::TTL_MINUTE * 10,
+			);
+
 			return $status;
 		} else {
 			return $status->fatal( 'migrateuseraccount-token-no-token',
