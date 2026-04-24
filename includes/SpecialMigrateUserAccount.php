@@ -124,7 +124,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		$user = $this->getUser();
 
 		// If the user is logged in, show an error.
-		if ( !$user->isAnon() ) {
+		if ( !$user->isAnon() && !$user->isTemp() ) {
 			throw new ErrorPageError( 'migrateuseraccount', 'migrateuseraccount-error-loggedin' );
 		}
 
@@ -211,10 +211,11 @@ class SpecialMigrateUserAccount extends SpecialPage {
 		while ( true ) {
 			// Ensure that the user is a stub (has no password set) before continuing
 			$dbr = MediaWikiServices::getInstance()->getDBLoadBalancer()->getConnection( DB_REPLICA );
-			$row = $dbr->selectRow( 'user', [ 'user_id', 'user_password' ], [ 'user_name' => $this->localUsername ],
+			$row = $dbr->selectRow( 'user', [
+				'user_id', 'user_password', 'user_is_temp' ], [ 'user_name' => $this->localUsername ],
 				__METHOD__ );
 
-			if ( !$row || $row->user_password != '' ) {
+			if ( !$row || $row->user_password != '' || $row->user_is_temp ) {
 				// User is not a stub
 				if ( !empty( $this->fallbackSuffix && !$isFallback ) ) {
 					// If a fallback suffix is set, try again but with that suffix
