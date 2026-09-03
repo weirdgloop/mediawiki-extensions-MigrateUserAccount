@@ -81,7 +81,7 @@ class UserMigrationService {
 				[ 'movePages' => true ]
 			);
 
-			if ( !$rename->renameUnsafe() ) {
+			if ( !$rename->renameUnsafe()->isOK() ) {
 				return $status->fatal( 'migrateuseraccount-rename-failed' );
 			}
 
@@ -132,7 +132,7 @@ class UserMigrationService {
 				// User is not a stub
 				if ( !empty( $fallbackSuffix && !$isFallback ) ) {
 					// If a fallback suffix is set, try again but with that suffix
-					$username = $username . $fallbackSuffix;
+					$username .= $fallbackSuffix;
 					$isFallback = true;
 					continue;
 				}
@@ -191,7 +191,7 @@ class UserMigrationService {
 		$apiUrl = $this->config->get( 'MUARemoteWikiAPI' ) .
 			'?format=json&formatversion=2&action=query&prop=revisions&titles=User:' . $un .
 			'&rvprop=comment|content|timestamp|user&rvlimit=1&rvslots=main';
-		$res = $this->httpRequestFactory->get( $apiUrl );
+		$res = $this->httpRequestFactory->get( $apiUrl, [], __METHOD__ );
 
 		if ( $res ) {
 			$data = json_decode( $res, true );
@@ -223,12 +223,12 @@ class UserMigrationService {
 
 					// Get the slots (for the revision content)
 					if ( isset( $revision['slots'] ) ) {
-						$textToTest = $textToTest . trim( $revision['slots']['main']['content'] );
+						$textToTest .= trim( $revision['slots']['main']['content'] );
 					}
 
 					// Get the edit summary
 					if ( isset( $revision['comment'] ) ) {
-						$textToTest = $textToTest . trim( $revision['comment'] );
+						$textToTest .= trim( $revision['comment'] );
 					}
 				}
 			}

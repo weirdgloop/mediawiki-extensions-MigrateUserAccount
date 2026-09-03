@@ -34,6 +34,7 @@ class RestApiCheckPasswordValidity extends SimpleHandler {
 	 */
 	public function run() {
 		$body = $this->getValidatedBody();
+		'@phan-var array $body';
 		$username = $body['username'];
 		$password = $body['password'];
 
