@@ -63,6 +63,7 @@ class UserMigrationService {
 		if ( !$user->isRegistered() ) {
 			return $status->fatal( 'migrateuseraccount-not-registered' );
 		}
+		'@phan-var User $user';
 		if ( !$user->isValidPassword( $password ) ) {
 			return $status->fatal( 'migrateuseraccount-invalid-password' );
 		}
@@ -81,13 +82,14 @@ class UserMigrationService {
 				[ 'movePages' => true ]
 			);
 
-			if ( !$rename->renameUnsafe() ) {
+			if ( !$rename->renameUnsafe()->isOK() ) {
 				return $status->fatal( 'migrateuseraccount-rename-failed' );
 			}
 
 			$this->logger->info( $user->getName() . ' has renamed their account to ' . $newUser->getName() );
 
 			$user = $this->userFactory->newFromName( $newUser->getName() );
+			'@phan-var User $user';
 		}
 
 		if ( !$user->changeAuthenticationData( [
@@ -130,9 +132,9 @@ class UserMigrationService {
 
 			if ( !$row || $row->user_password != '' || $row->user_is_temp ) {
 				// User is not a stub
-				if ( !empty( $fallbackSuffix && !$isFallback ) ) {
+				if ( $fallbackSuffix && !$isFallback ) {
 					// If a fallback suffix is set, try again but with that suffix
-					$username = $username . $fallbackSuffix;
+					$username .= $fallbackSuffix;
 					$isFallback = true;
 					continue;
 				}
@@ -191,7 +193,7 @@ class UserMigrationService {
 		$apiUrl = $this->config->get( 'MUARemoteWikiAPI' ) .
 			'?format=json&formatversion=2&action=query&prop=revisions&titles=User:' . $un .
 			'&rvprop=comment|content|timestamp|user&rvlimit=1&rvslots=main';
-		$res = $this->httpRequestFactory->get( $apiUrl );
+		$res = $this->httpRequestFactory->get( $apiUrl, [], __METHOD__ );
 
 		if ( $res ) {
 			$data = json_decode( $res, true );
@@ -223,12 +225,12 @@ class UserMigrationService {
 
 					// Get the slots (for the revision content)
 					if ( isset( $revision['slots'] ) ) {
-						$textToTest = $textToTest . trim( $revision['slots']['main']['content'] );
+						$textToTest .= trim( $revision['slots']['main']['content'] );
 					}
 
 					// Get the edit summary
 					if ( isset( $revision['comment'] ) ) {
-						$textToTest = $textToTest . trim( $revision['comment'] );
+						$textToTest .= trim( $revision['comment'] );
 					}
 				}
 			}
