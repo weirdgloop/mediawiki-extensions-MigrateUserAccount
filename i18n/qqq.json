@@ -21,6 +21,8 @@
 	"migrateuseraccount-form-confirm-password": "The text used on the form label for the confirm password field.",
 	"migrateuseraccount-form-username": "The text used on the form label for the username field.",
 	"migrateuseraccount-form-username-help": "The help text used on the form label for the username field.",
+	"migrateuseraccount-form-newusername": "The text used on the form label for the new username field.",
+	"migrateuseraccount-form-newusername-help": "The help text used on the form label for the new username field.",
 	"migrateuseraccount-migrated-log-entry": "The text used on the public log entry when a user migrates their account.",
 	"migrateuseraccount-success": "The message displayed when the account migration is successful.\nParameters:\n* $1 - Username",
 	"migrateuseraccount-failed": "The generic error message displayed if the account migration was not successful.",
