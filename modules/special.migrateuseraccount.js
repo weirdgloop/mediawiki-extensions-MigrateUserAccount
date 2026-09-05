@@ -3,16 +3,14 @@
  * Derived from resources/src/mediawiki.misc-authed-ooui/special.changecredentials.js
  */
 ( function () {
-	mw.hook( 'htmlform.enhance' ).add( function ( $root ) {
-		var api = new mw.Rest();
+	mw.hook( 'htmlform.enhance' ).add( ( $root ) => {
+		const api = new mw.Rest();
 
 		$root.find( '.mw-migrateuseraccount-validate-password.oo-ui-fieldLayout' ).each( function () {
-			var currentApiPromise,
-				self = OO.ui.FieldLayout.static.infuse( $( this ) );
+			let currentApiPromise;
+			const self = OO.ui.FieldLayout.static.infuse( $( this ) );
 
-			self.getField().setValidation( function ( password ) {
-				var d;
-
+			self.getField().setValidation( ( password ) => {
 				if ( currentApiPromise ) {
 					currentApiPromise.abort();
 					currentApiPromise = undefined;
@@ -25,20 +23,19 @@
 					return true;
 				}
 
-				d = $.Deferred();
+				const d = $.Deferred();
+				// eslint-disable-next-line no-jquery/no-done-fail
 				currentApiPromise = api.post( '/migrateuseraccount/v0/validatepassword', {
 					username: $root.find( '#mw-input-wpusername' ).val(),
 					password: password
-				} ).done( function ( resp ) {
-					var errors,
-						good = resp.validity === 'Good' || !Object.keys(resp).length;
+				} ).done( ( resp ) => {
+					let errors;
+					const good = resp.validity === 'Good' || !Object.keys( resp ).length;
 
 					currentApiPromise = undefined;
 
 					if ( !good ) {
-						errors = resp.validitymessages.map( function ( m ) {
-							return new OO.ui.HtmlSnippet( m );
-						} );
+						errors = resp.validitymessages.map( ( m ) => new OO.ui.HtmlSnippet( m ) );
 					}
 					self.setErrors( errors || [] );
 					d.resolve( good );

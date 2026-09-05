@@ -6,7 +6,9 @@
 }
 
 .mua-token-details h3 {
+	/* stylelint-disable-next-line declaration-no-important */
 	margin: 0 !important;
+	/* stylelint-disable-next-line declaration-no-important */
 	padding: 0 !important;
 }
 
