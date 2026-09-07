@@ -19,6 +19,8 @@
 	"migrateuseraccount-token-username-no-match": "The last edit on $1 was made from the wrong account. Please ensure you are logged in to the correct account.",
 	"migrateuseraccount-form-password": "New password",
 	"migrateuseraccount-form-confirm-password": "Confirm new password",
+	"migrateuseraccount-form-email": "Email address (optional)",
+	"migrateuseraccount-form-email-help": "If you want to receive edit notifications via email, or recover your wiki account in case you forget your password, you can enter your email address here.",
 	"migrateuseraccount-form-username": "Username",
 	"migrateuseraccount-form-username-help": "This is the account you'd like to migrate from the old wiki.",
 	"migrateuseraccount-form-newusername": "New username",
@@ -26,7 +28,10 @@
 	"migrateuseraccount-migrated-log-entry": "migrated their account",
 	"migrateuseraccount-success": "Your account has been migrated. You can now [[Special:UserLogin|login]] with your username \"$1\" and your chosen password.",
 	"migrateuseraccount-failed": "There was a problem migrating your account. Please try again later.",
+	"migrateuseraccount-email-failed": "However, there was a problem sending you a confirmation email. Please visit [[Special:Preferences|your preferences]] to set/confirm your email address.",
+	"migrateuseraccount-email-confirm": "We have sent a confirmation email to $1. Please click the link in the email to confirm your email address.",
 	"migrateuseraccount-invalid-password": "The password you provided is not valid. Please ensure that it meets the requirements for this wiki.",
+	"migrateuseraccount-invalid-email": "The email that you entered is not valid.",
 	"migrateuseraccount-wrong-confirm-password": "The passwords you entered do not match.",
 	"migrateuseraccount-invalid-username": "The new username you entered is invalid or is in use."
 }

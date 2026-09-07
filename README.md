@@ -39,6 +39,8 @@ This extension can be configured using the `LocalSettings.php` file in your Medi
 | `$wgMUARemoteWikiAPI`         | string | URL to the remote wiki's API. For FANDOM sites, this is something like `https://community.fandom.com/api.php`                                                                                                                         |         |
 | `$wgMUAShowNoticeOnLogin`     | bool   | Whether to show a message directing users to migrate their accounts if necessary on Special:UserLogin and Special:CreateAccount *(if you prefer, set this to false and set your own message in `MediaWiki:Loginprompt` on your wiki)* | `true`  |
 | `$wgMUALogToWiki`             | bool   | Whether we should log to a public log on `Special:Log` when a user migrates their account                                                                                                                                             | `true`  |
+| `$wgMUAShowEmailField`        | bool   | Whether to show a field for users to enter their email address during account migration, similarly to account creation                                                                                                                | `false` |
+
 There are some additional config variables that you can find in `extension.json`, but they should generally not be used outside of [Weird Gloop](https://weirdgloop.org) wikis.
 
 ## Debugging
