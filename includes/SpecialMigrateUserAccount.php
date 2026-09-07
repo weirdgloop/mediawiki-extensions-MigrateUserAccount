@@ -238,7 +238,7 @@ class SpecialMigrateUserAccount extends SpecialPage {
 				return true;
 			}
 
-			if ( !empty( $email ) && !Sanitizer::validateEmail( $email ) ) {
+			if ( $email && !Sanitizer::validateEmail( $email ) ) {
 				$this->getOutput()->addHTML(
 					Html::errorBox(
 						$this->msg( 'migrateuseraccount-invalid-email' )->parse()
@@ -265,14 +265,14 @@ class SpecialMigrateUserAccount extends SpecialPage {
 
 			$user = $result->getValue();
 			$emailMessage = '';
-			if ( !empty( $email ) ) {
+			if ( $email ) {
 				$status = $user->setEmailWithConfirmation( $email );
 				if ( !$status->isGood() ) {
 					$this->logger->error( $this->localUsername . ' failed to change email: ' .
 						$status->getMessage()->text()
 					);
 					$emailMessage = $this->msg( 'migrateuseraccount-email-failed' )->parse();
-				} else if ( $status->value === 'eauth' ) {
+				} elseif ( $status->value === 'eauth' ) {
 					$emailMessage = $this->msg( 'migrateuseraccount-email-confirm', $email )->parse();
 				}
 			}
